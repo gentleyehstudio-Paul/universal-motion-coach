@@ -7,14 +7,17 @@ import type { CommonSkeletonFrame } from "@/lib/pose/types";
 
 interface PoseTrackedVideoProps {
   src: string;
-  /** Called once per extracted frame, in playback order. M2 will fold
-   * these into a MotionSequence; for M1 this is just an escape hatch. */
+  /** Called once per extracted frame, in playback order. */
   onFrame?: (frame: CommonSkeletonFrame) => void;
+  /** Called when playback reaches the end, with the source video's
+   * natural (not display) pixel dimensions — needed for aspect-correct
+   * angle math in buildMotionSequence. Fires once per full playthrough. */
+  onPlaybackEnded?: (videoWidth: number, videoHeight: number) => void;
 }
 
 type Status = "loading_model" | "ready" | "tracking" | "error";
 
-export function PoseTrackedVideo({ src, onFrame }: PoseTrackedVideoProps) {
+export function PoseTrackedVideo({ src, onFrame, onPlaybackEnded }: PoseTrackedVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const providerRef = useRef<MediaPipeProvider | null>(null);
@@ -80,13 +83,19 @@ export function PoseTrackedVideo({ src, onFrame }: PoseTrackedVideoProps) {
       rafId = requestAnimationFrame(loop);
     };
 
+    const handleEnded = () => {
+      onPlaybackEnded?.(video.videoWidth, video.videoHeight);
+    };
+
     setStatus("tracking");
     window.addEventListener("resize", syncCanvasSize);
+    video.addEventListener("ended", handleEnded);
     rafId = requestAnimationFrame(loop);
 
     return () => {
       stopped = true;
       window.removeEventListener("resize", syncCanvasSize);
+      video.removeEventListener("ended", handleEnded);
       cancelAnimationFrame(rafId);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

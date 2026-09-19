@@ -48,7 +48,7 @@
     "left_shoulder", "right_shoulder", "left_hip", "right_hip",
     "left_wrist", "right_wrist"
   ],
-  "relevantAngles": ["torso", "left_shoulder_rotation"],
+  "relevantAngles": ["torso", "shoulder_hip_separation"],
   "temporalRelationships": [
     { "before": "address", "after": "backswing" },
     { "before": "backswing", "after": "top" },
