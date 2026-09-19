@@ -2,14 +2,18 @@
 
 import { useRef, useState } from "react";
 import { notFound } from "next/navigation";
-import { getTemplate } from "@/lib/template/registry";
+import { getTemplate, getRuleSet } from "@/lib/template/registry";
 import { CameraGuidance } from "@/components/CameraGuidance";
 import { VideoSourcePicker } from "@/components/VideoSourcePicker";
 import { PoseTrackedVideo } from "@/components/PoseTrackedVideo";
 import { MotionAnalysisPanel } from "@/components/MotionAnalysisPanel";
+import { PrimaryCorrectionCard } from "@/components/PrimaryCorrectionCard";
 import { buildMotionSequence } from "@/lib/motion/build-sequence";
 import { detectPhases } from "@/lib/motion/phase-detector";
-import type { MotionSequence } from "@/lib/motion/types";
+import { evaluateRules } from "@/lib/rules/evaluate";
+import { selectPrimaryFinding } from "@/lib/rules/select-primary";
+import { generateCorrection } from "@/lib/correction/generate";
+import type { MotionSequence, Correction, Finding } from "@/lib/motion/types";
 import type { CommonSkeletonFrame } from "@/lib/pose/types";
 
 export default function RecordPage({
@@ -18,15 +22,20 @@ export default function RecordPage({
   params: { sportId: string };
 }) {
   const template = getTemplate(params.sportId);
+  const ruleSet = getRuleSet(params.sportId);
   const [videoSrc, setVideoSrc] = useState<string | null>(null);
   const [sequence, setSequence] = useState<MotionSequence | null>(null);
+  const [primary, setPrimary] = useState<{ finding: Finding; correction: Correction } | null>(
+    null
+  );
   const framesRef = useRef<CommonSkeletonFrame[]>([]);
 
-  if (!template) return notFound();
+  if (!template || !ruleSet) return notFound();
 
   const handleVideoReady = (src: string) => {
     framesRef.current = [];
     setSequence(null);
+    setPrimary(null);
     setVideoSrc(src);
   };
 
@@ -40,7 +49,22 @@ export default function RecordPage({
       videoHeight,
       frames: framesRef.current,
     });
-    setSequence({ ...built, phases: detectPhases(built, template) });
+    const withPhases = { ...built, phases: detectPhases(built, template) };
+    setSequence(withPhases);
+
+    const findings = evaluateRules(withPhases, ruleSet.evaluationRules);
+    const primaryFinding = selectPrimaryFinding(findings);
+    if (primaryFinding) {
+      const correctionTemplate = ruleSet.corrections[primaryFinding.issueId];
+      if (correctionTemplate) {
+        setPrimary({
+          finding: primaryFinding,
+          correction: generateCorrection(primaryFinding, correctionTemplate),
+        });
+      }
+    } else {
+      setPrimary(null);
+    }
   };
 
   return (
@@ -67,6 +91,16 @@ export default function RecordPage({
           >
             Record or upload a different clip
           </button>
+
+          {sequence && primary && (
+            <PrimaryCorrectionCard finding={primary.finding} correction={primary.correction} />
+          )}
+          {sequence && !primary && (
+            <div className="rounded-lg border border-emerald-800/50 bg-emerald-950/20 p-4 text-sm text-emerald-300">
+              No issues detected against the rules we currently check for this movement.
+            </div>
+          )}
+
           {sequence && <MotionAnalysisPanel sequence={sequence} template={template} />}
         </div>
       )}

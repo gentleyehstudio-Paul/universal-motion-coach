@@ -1,0 +1,25 @@
+{
+  "evaluationRules": [
+    {
+      "id": "golf_swing.insufficient_shoulder_turn",
+      "issueId": "golf_swing.insufficient_shoulder_turn",
+      "qualityDimension": "coordination",
+      "phase": "top",
+      "metric": { "signal": "segment_angle.shoulder_hip_separation", "aggregation": "max_abs" },
+      "baselineSource": "biomechanical_rule",
+      "baselineValue": 40,
+      "comparison": "less_than",
+      "unit": "degrees",
+      "severityBands": { "mild": 10, "moderate": 20, "severe": 30 }
+    }
+  ],
+  "corrections": {
+    "golf_swing.insufficient_shoulder_turn": {
+      "what": "Limited shoulder rotation at the top of your backswing.",
+      "why": "Without enough separation between shoulders and hips at the top, you lose the stored rotational power a full backswing turn generates.",
+      "whatToChange": "Turn your shoulders further away from the target before starting the downswing.",
+      "cue": "Turn your back fully to the target.",
+      "drill": "Cross-arm turn drill: cross your arms over your chest holding a club and practice rotating your shoulders 90° while keeping your hips more stable."
+    }
+  }
+}

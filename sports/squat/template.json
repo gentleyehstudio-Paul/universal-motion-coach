@@ -49,7 +49,7 @@
     { "before": "bottom", "after": "ascent" },
     { "before": "ascent", "after": "standing_end" }
   ],
-  "evaluationRuleIds": ["squat.knee_valgus", "squat.excessive_forward_lean"],
+  "evaluationRuleIds": ["squat.insufficient_depth", "squat.excessive_forward_lean"],
   "visualization": {
     "anchor": "hip",
     "rotationNormalization": true,

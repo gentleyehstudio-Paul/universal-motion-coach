@@ -1,0 +1,44 @@
+{
+  "evaluationRules": [
+    {
+      "id": "squat.insufficient_depth",
+      "issueId": "squat.insufficient_depth",
+      "qualityDimension": "completeness",
+      "phase": "bottom",
+      "metric": { "signal": "joint_angle.left_knee_flexion", "aggregation": "min" },
+      "baselineSource": "biomechanical_rule",
+      "baselineValue": 100,
+      "comparison": "greater_than",
+      "unit": "degrees",
+      "severityBands": { "mild": 10, "moderate": 20, "severe": 35 }
+    },
+    {
+      "id": "squat.excessive_forward_lean",
+      "issueId": "squat.excessive_forward_lean",
+      "qualityDimension": "alignment",
+      "phase": "bottom",
+      "metric": { "signal": "segment_angle.torso", "aggregation": "max_abs" },
+      "baselineSource": "biomechanical_rule",
+      "baselineValue": 20,
+      "comparison": "greater_than",
+      "unit": "degrees",
+      "severityBands": { "mild": 5, "moderate": 15, "severe": 30 }
+    }
+  ],
+  "corrections": {
+    "squat.insufficient_depth": {
+      "what": "You're not reaching a full squat depth.",
+      "why": "Stopping short of parallel gives the glutes and hamstrings less time under tension, making the squat less effective.",
+      "whatToChange": "Keep lowering until your hip crease drops at least to knee height before driving back up.",
+      "cue": "Sit back until your thighs are parallel to the floor.",
+      "drill": "Box squats to a chair or bench just below parallel, focusing on a controlled, full-depth sit."
+    },
+    "squat.excessive_forward_lean": {
+      "what": "Your torso is leaning too far forward during the squat.",
+      "why": "Excessive forward lean shifts load onto your lower back and away from your legs.",
+      "whatToChange": "Keep your chest up and torso more vertical as you descend.",
+      "cue": "Proud chest, sit down not forward.",
+      "drill": "Goblet squats holding a light weight at chest height to cue a more upright torso."
+    }
+  }
+}

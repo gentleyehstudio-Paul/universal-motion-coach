@@ -33,7 +33,7 @@ function smoothstep(t: number): number {
  * from a real (unpredictable) video. Ankle is planted; hip position
  * falls out of the kinematics as the knee bends, matching how a real
  * squat actually moves. */
-function squatFrameAtDepth(d: number, sideOffsetX: number) {
+function squatFrameAtDepth(d: number, sideOffsetX: number, bottomKneeAngleDeg: number) {
   const ankle = { x: 320 + sideOffsetX, y: 420 };
   const shankLength = 120;
   const thighLength = 120;
@@ -47,7 +47,7 @@ function squatFrameAtDepth(d: number, sideOffsetX: number) {
   };
 
   const kneeToAnkle = { x: ankle.x - knee.x, y: ankle.y - knee.y };
-  const kneeAngleDeg = 180 - 90 * d; // 180 standing, 90 at bottom
+  const kneeAngleDeg = 180 - (180 - bottomKneeAngleDeg) * d; // 180 standing, bottomKneeAngleDeg at bottom
   const deltaFromStraight = 180 - kneeAngleDeg;
   const kneeToHipDir = rotateDegrees(
     { x: -kneeToAnkle.x, y: -kneeToAnkle.y },
@@ -85,12 +85,15 @@ function depthAtFrame(i: number): number {
   return 0;
 }
 
-export function buildSyntheticSquatFrames(totalFrames: number): CommonSkeletonFrame[] {
+export function buildSyntheticSquatFrames(
+  totalFrames: number,
+  bottomKneeAngleDeg = 90
+): CommonSkeletonFrame[] {
   const frames: CommonSkeletonFrame[] = [];
   for (let i = 0; i < totalFrames; i++) {
     const d = depthAtFrame(i);
-    const left = squatFrameAtDepth(d, -20);
-    const right = squatFrameAtDepth(d, 20);
+    const left = squatFrameAtDepth(d, -20, bottomKneeAngleDeg);
+    const right = squatFrameAtDepth(d, 20, bottomKneeAngleDeg);
     frames.push({
       frameIndex: i,
       timestampMs: (i * 1000) / SYNTHETIC_SQUAT_FPS,

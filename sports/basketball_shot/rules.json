@@ -1,0 +1,25 @@
+{
+  "evaluationRules": [
+    {
+      "id": "basketball_shot.excessive_forward_lean_at_release",
+      "issueId": "basketball_shot.excessive_forward_lean_at_release",
+      "qualityDimension": "alignment",
+      "phase": "release",
+      "metric": { "signal": "segment_angle.torso", "aggregation": "max_abs" },
+      "baselineSource": "biomechanical_rule",
+      "baselineValue": 15,
+      "comparison": "greater_than",
+      "unit": "degrees",
+      "severityBands": { "mild": 5, "moderate": 12, "severe": 25 }
+    }
+  ],
+  "corrections": {
+    "basketball_shot.excessive_forward_lean_at_release": {
+      "what": "Excessive forward torso lean during release.",
+      "why": "Leaning into the shot at release sends horizontal momentum into the ball's flight path, making the shot less consistent.",
+      "whatToChange": "Stay vertical through the shot instead of leaning toward the basket.",
+      "cue": "Jump upward, not toward the basket.",
+      "drill": "Stationary form shooting close to the hoop, focusing on a straight up-and-down jump."
+    }
+  }
+}

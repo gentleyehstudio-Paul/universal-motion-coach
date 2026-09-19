@@ -56,7 +56,7 @@
     { "before": "downswing", "after": "impact" },
     { "before": "impact", "after": "follow_through" }
   ],
-  "evaluationRuleIds": ["golf_swing.early_extension"],
+  "evaluationRuleIds": ["golf_swing.insufficient_shoulder_turn"],
   "visualization": {
     "anchor": "torso",
     "rotationNormalization": false,
