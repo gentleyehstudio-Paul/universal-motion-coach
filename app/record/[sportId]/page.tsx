@@ -8,6 +8,7 @@ import { VideoSourcePicker } from "@/components/VideoSourcePicker";
 import { PoseTrackedVideo } from "@/components/PoseTrackedVideo";
 import { MotionAnalysisPanel } from "@/components/MotionAnalysisPanel";
 import { buildMotionSequence } from "@/lib/motion/build-sequence";
+import { detectPhases } from "@/lib/motion/phase-detector";
 import type { MotionSequence } from "@/lib/motion/types";
 import type { CommonSkeletonFrame } from "@/lib/pose/types";
 
@@ -39,7 +40,7 @@ export default function RecordPage({
       videoHeight,
       frames: framesRef.current,
     });
-    setSequence(built);
+    setSequence({ ...built, phases: detectPhases(built, template) });
   };
 
   return (

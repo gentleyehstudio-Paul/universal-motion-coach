@@ -145,7 +145,15 @@ interface PhaseDefinition {
 type SignalCondition =
   | { type: 'local_max' | 'local_min' }
   | { type: 'threshold_crossed'; direction: 'above' | 'below'; value: number }
-  | { type: 'velocity_sign_change' };
+  | { type: 'velocity_sign_change' }
+  // The recording's own start/end, not a detected event — use for a
+  // template's first-phase entryCondition and last-phase exitCondition.
+  // threshold_crossed on a raw landmark position is camera-distance-
+  // dependent (an absolute image-space y-coordinate means something
+  // different at every framing) and not a meaningful "movement genuinely
+  // started" signal; threshold_crossed on an angle (e.g. golf's torso <
+  // 5deg at address) is scale-invariant and fine to keep using instead.
+  | { type: 'sequence_boundary' };
 ```
 
 ## 4. DetectedPhase — output of phase detection

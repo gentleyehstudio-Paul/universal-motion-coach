@@ -10,7 +10,7 @@
     {
       "name": "standing",
       "primarySignal": "landmark.left_hip.y",
-      "entryCondition": { "type": "threshold_crossed", "direction": "above", "value": 0 },
+      "entryCondition": { "type": "sequence_boundary" },
       "exitCondition": { "type": "velocity_sign_change" }
     },
     {
@@ -35,7 +35,7 @@
       "name": "standing_end",
       "primarySignal": "landmark.left_hip.y",
       "entryCondition": { "type": "local_min" },
-      "exitCondition": { "type": "threshold_crossed", "direction": "above", "value": 0 }
+      "exitCondition": { "type": "sequence_boundary" }
     }
   ],
   "keyJoints": [

@@ -56,6 +56,31 @@ export function MotionAnalysisPanel({
       </div>
 
       <div className="border-t border-neutral-800 pt-3">
+        <div className="mb-1 text-neutral-400">Detected phases</div>
+        {sequence.phases.length === 0 ? (
+          <div className="text-neutral-500">none detected</div>
+        ) : (
+          <table className="w-full text-left">
+            <tbody>
+              {sequence.phases.map((phase) => (
+                <tr key={phase.name}>
+                  <td className="py-0.5 pr-3 text-neutral-400">{phase.name}</td>
+                  <td className="py-0.5 text-neutral-200">
+                    frames {phase.startFrame}–{phase.endFrame}
+                    {phase.confidence < 1 && (
+                      <span className="ml-2 text-amber-500">
+                        (low confidence: boundary not found, truncated at clip end)
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      <div className="border-t border-neutral-800 pt-3">
         <div className="mb-1 text-neutral-400">Relevant angle ranges ({template.displayName})</div>
         <table className="w-full text-left">
           <tbody>
