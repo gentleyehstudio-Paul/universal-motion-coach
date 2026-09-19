@@ -1,0 +1,6 @@
+fastapi>=0.111
+uvicorn[standard]>=0.30
+pydantic>=2.7
+
+# Added starting M2 (motion representation) / M5 (alignment):
+# numpy, scipy, opencv-python-headless, dtaidistance, rtmlib

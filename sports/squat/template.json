@@ -1,0 +1,58 @@
+{
+  "sportId": "squat",
+  "displayName": "Squat",
+  "cameraGuidance": {
+    "angle": "Side-on (90° to your body), camera at hip height",
+    "distance": "Far enough to see your full body with head and feet in frame",
+    "orientation": "side"
+  },
+  "phases": [
+    {
+      "name": "standing",
+      "primarySignal": "landmark.left_hip.y",
+      "entryCondition": { "type": "threshold_crossed", "direction": "above", "value": 0 },
+      "exitCondition": { "type": "velocity_sign_change" }
+    },
+    {
+      "name": "descent",
+      "primarySignal": "landmark.left_hip.y",
+      "entryCondition": { "type": "velocity_sign_change" },
+      "exitCondition": { "type": "local_max" }
+    },
+    {
+      "name": "bottom",
+      "primarySignal": "landmark.left_hip.y",
+      "entryCondition": { "type": "local_max" },
+      "exitCondition": { "type": "velocity_sign_change" }
+    },
+    {
+      "name": "ascent",
+      "primarySignal": "landmark.left_hip.y",
+      "entryCondition": { "type": "velocity_sign_change" },
+      "exitCondition": { "type": "local_min" }
+    },
+    {
+      "name": "standing_end",
+      "primarySignal": "landmark.left_hip.y",
+      "entryCondition": { "type": "local_min" },
+      "exitCondition": { "type": "threshold_crossed", "direction": "above", "value": 0 }
+    }
+  ],
+  "keyJoints": [
+    "left_hip", "right_hip", "left_knee", "right_knee",
+    "left_ankle", "right_ankle", "left_shoulder", "right_shoulder"
+  ],
+  "relevantAngles": ["left_knee_flexion", "right_knee_flexion", "torso"],
+  "temporalRelationships": [
+    { "before": "standing", "after": "descent" },
+    { "before": "descent", "after": "bottom" },
+    { "before": "bottom", "after": "ascent" },
+    { "before": "ascent", "after": "standing_end" }
+  ],
+  "evaluationRuleIds": ["squat.knee_valgus", "squat.excessive_forward_lean"],
+  "visualization": {
+    "anchor": "hip",
+    "rotationNormalization": true,
+    "trailJoints": ["left_hip", "left_knee"]
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "sportId": "golf_swing",
+  "displayName": "Golf Swing",
+  "cameraGuidance": {
+    "angle": "Face-on or down-the-line (behind, aimed at target line), camera at waist height",
+    "distance": "Far enough to see the full swing arc including club above the head at the top",
+    "orientation": "front_side"
+  },
+  "phases": [
+    {
+      "name": "address",
+      "primarySignal": "segment_angle.torso",
+      "entryCondition": { "type": "threshold_crossed", "direction": "below", "value": 5 },
+      "exitCondition": { "type": "velocity_sign_change" }
+    },
+    {
+      "name": "backswing",
+      "primarySignal": "segment_angle.torso",
+      "entryCondition": { "type": "velocity_sign_change" },
+      "exitCondition": { "type": "local_max" }
+    },
+    {
+      "name": "top",
+      "primarySignal": "segment_angle.torso",
+      "entryCondition": { "type": "local_max" },
+      "exitCondition": { "type": "velocity_sign_change" }
+    },
+    {
+      "name": "downswing",
+      "primarySignal": "segment_angle.torso",
+      "entryCondition": { "type": "velocity_sign_change" },
+      "exitCondition": { "type": "threshold_crossed", "direction": "below", "value": 5 }
+    },
+    {
+      "name": "impact",
+      "primarySignal": "segment_angle.torso",
+      "entryCondition": { "type": "threshold_crossed", "direction": "below", "value": 5 },
+      "exitCondition": { "type": "velocity_sign_change" }
+    },
+    {
+      "name": "follow_through",
+      "primarySignal": "segment_angle.torso",
+      "entryCondition": { "type": "velocity_sign_change" },
+      "exitCondition": { "type": "local_min" }
+    }
+  ],
+  "keyJoints": [
+    "left_shoulder", "right_shoulder", "left_hip", "right_hip",
+    "left_wrist", "right_wrist"
+  ],
+  "relevantAngles": ["torso", "left_shoulder_rotation"],
+  "temporalRelationships": [
+    { "before": "address", "after": "backswing" },
+    { "before": "backswing", "after": "top" },
+    { "before": "top", "after": "downswing" },
+    { "before": "downswing", "after": "impact" },
+    { "before": "impact", "after": "follow_through" }
+  ],
+  "evaluationRuleIds": ["golf_swing.early_extension"],
+  "visualization": {
+    "anchor": "torso",
+    "rotationNormalization": false,
+    "trailJoints": ["right_wrist", "left_hip"]
+  }
+}

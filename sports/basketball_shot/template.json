@@ -1,0 +1,79 @@
+{
+  "sportId": "basketball_shot",
+  "displayName": "Basketball Jump Shot",
+  "cameraGuidance": {
+    "angle": "45° front-side angle, camera at chest height",
+    "distance": "Far enough to see full body plus the ball above the head at the top of the shot",
+    "orientation": "45_degree"
+  },
+  "phases": [
+    {
+      "name": "ready",
+      "primarySignal": "landmark.right_wrist.y",
+      "entryCondition": { "type": "threshold_crossed", "direction": "below", "value": 0.6 },
+      "exitCondition": { "type": "velocity_sign_change" }
+    },
+    {
+      "name": "dip",
+      "primarySignal": "landmark.left_hip.y",
+      "entryCondition": { "type": "velocity_sign_change" },
+      "exitCondition": { "type": "local_max" }
+    },
+    {
+      "name": "load",
+      "primarySignal": "landmark.left_hip.y",
+      "entryCondition": { "type": "local_max" },
+      "exitCondition": { "type": "velocity_sign_change" }
+    },
+    {
+      "name": "upward_drive",
+      "primarySignal": "landmark.left_hip.y",
+      "entryCondition": { "type": "velocity_sign_change" },
+      "exitCondition": { "type": "local_min" }
+    },
+    {
+      "name": "set_point",
+      "primarySignal": "landmark.right_wrist.y",
+      "entryCondition": { "type": "local_min" },
+      "exitCondition": { "type": "velocity_sign_change" }
+    },
+    {
+      "name": "release",
+      "primarySignal": "landmark.right_wrist.y",
+      "entryCondition": { "type": "velocity_sign_change" },
+      "exitCondition": { "type": "local_max" }
+    },
+    {
+      "name": "follow_through",
+      "primarySignal": "landmark.right_wrist.y",
+      "entryCondition": { "type": "local_max" },
+      "exitCondition": { "type": "velocity_sign_change" }
+    },
+    {
+      "name": "landing",
+      "primarySignal": "landmark.left_hip.y",
+      "entryCondition": { "type": "local_min" },
+      "exitCondition": { "type": "threshold_crossed", "direction": "above", "value": 0 }
+    }
+  ],
+  "keyJoints": [
+    "right_wrist", "right_elbow", "right_shoulder",
+    "left_hip", "right_hip", "left_knee", "right_knee", "left_ankle", "right_ankle"
+  ],
+  "relevantAngles": ["right_elbow_flexion", "torso"],
+  "temporalRelationships": [
+    { "before": "ready", "after": "dip" },
+    { "before": "dip", "after": "load" },
+    { "before": "load", "after": "upward_drive", "maxGapMs": 800 },
+    { "before": "upward_drive", "after": "set_point" },
+    { "before": "set_point", "after": "release" },
+    { "before": "release", "after": "follow_through" },
+    { "before": "follow_through", "after": "landing" }
+  ],
+  "evaluationRuleIds": ["basketball_shot.excessive_forward_lean_at_release"],
+  "visualization": {
+    "anchor": "hip",
+    "rotationNormalization": false,
+    "trailJoints": ["right_wrist"]
+  }
+}
