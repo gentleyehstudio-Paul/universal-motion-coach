@@ -72,6 +72,8 @@ class MotionSequence(CamelModel):
     fps: float
     duration: float
     frame_count: int
+    video_width: float
+    video_height: float
     landmarks: list[CommonSkeletonFrame]
     joint_angles: list[JointAngleFrame]
     segment_angles: list[SegmentAngleFrame]
@@ -108,8 +110,21 @@ class Correction(CamelModel):
     drill: str
 
 
+class PhaseAlignment(CamelModel):
+    phase_name: str
+    before_range: tuple[int, int]
+    after_range: tuple[int, int]
+
+
+class AlignmentParams(CamelModel):
+    sakoe_chiba_radius: int
+    feature_space: Literal["joint_angles"]
+
+
 class AlignmentMap(CamelModel):
     before_sequence_id: str
     after_sequence_id: str
     frame_map: dict[int, int]
+    phase_alignment: list[PhaseAlignment]
     method: Literal["dtw_windowed_phase_seeded"]
+    params: AlignmentParams

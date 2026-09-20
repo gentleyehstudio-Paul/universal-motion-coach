@@ -42,6 +42,14 @@ export interface MotionSequence {
   fps: number;
   duration: number;
   frameCount: number;
+  // The source video's natural pixel dimensions. Needed downstream by
+  // SpatialAligner (and anything else re-deriving pixel-space geometry
+  // from the normalized [0,1] landmarks/centers below) — without these,
+  // a stored MotionSequence can't be correctly re-interpreted later,
+  // since normalized x/y share a common scale only once multiplied back
+  // out by the right width/height (see geometry.ts's toPixelSpace).
+  videoWidth: number;
+  videoHeight: number;
 
   landmarks: CommonSkeletonFrame[];
   jointAngles: JointAngleFrame[];

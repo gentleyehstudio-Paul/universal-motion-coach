@@ -15,10 +15,7 @@ export function evaluateRules(sequence: MotionSequence, rules: EvaluationRule[])
     const phase = sequence.phases.find((p) => p.name === rule.phase);
     if (!phase) continue;
 
-    const signal = resolveSignal(sequence, rule.metric.signal);
-    if (signal === null) continue;
-
-    const measuredValue = aggregate(signal, rule.metric.aggregation, phase.startFrame, phase.endFrame);
+    const measuredValue = measureRule(sequence, rule);
     if (measuredValue === null) continue;
 
     const deviation =
@@ -50,6 +47,22 @@ export function evaluateRules(sequence: MotionSequence, rules: EvaluationRule[])
   }
 
   return findings;
+}
+
+/** The raw aggregated measurement for a rule, regardless of whether it
+ * would clear the "mild" deviation threshold. evaluateRules() only ever
+ * reports a Finding once that bar is cleared, but a before/after
+ * comparison needs the actual number even when "after" is now within
+ * normal range (that's the improvement the comparison exists to show) —
+ * see the record page's after-recording comparison. */
+export function measureRule(sequence: MotionSequence, rule: EvaluationRule): number | null {
+  const phase = sequence.phases.find((p) => p.name === rule.phase);
+  if (!phase) return null;
+
+  const signal = resolveSignal(sequence, rule.metric.signal);
+  if (signal === null) return null;
+
+  return aggregate(signal, rule.metric.aggregation, phase.startFrame, phase.endFrame);
 }
 
 function aggregate(

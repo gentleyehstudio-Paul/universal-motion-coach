@@ -19,8 +19,20 @@ export function toPixelSpace(
   return { x: normalized.x * videoWidth, y: normalized.y * videoHeight };
 }
 
-function sub(a: Vec2, b: Vec2): Vec2 {
+export function sub(a: Vec2, b: Vec2): Vec2 {
   return { x: a.x - b.x, y: a.y - b.y };
+}
+
+/** Rotates `v` by `degrees` (standard mathematical rotation matrix; sign
+ * convention doesn't matter for jointAngleDegrees/rotationDifferenceDegrees
+ * since they only care about relative angle magnitude, but callers that
+ * care about direction — like SpatialAligner counter-rotating a lean —
+ * should verify sign against their own use). */
+export function rotateVector(v: Vec2, degrees: number): Vec2 {
+  const rad = (degrees * Math.PI) / 180;
+  const cos = Math.cos(rad);
+  const sin = Math.sin(rad);
+  return { x: v.x * cos - v.y * sin, y: v.x * sin + v.y * cos };
 }
 
 function dot(a: Vec2, b: Vec2): number {

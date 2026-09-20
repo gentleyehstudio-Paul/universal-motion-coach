@@ -5,36 +5,67 @@ identify what to fix, show the correction, record again, and visually
 overlay before/after motion to make invisible movement differences
 visible.
 
-## Status: Phase 1 (Research & Architecture) — implementation not started
+## Status: Phase 2 (MVP implementation) — M0–M5 of 7 done
 
-This repository currently contains the research, architecture, and
-planning deliverables produced before any code is written. See `docs/`:
+See [`docs/mvp-plan.md`](docs/mvp-plan.md) for the full milestone plan
+against three deliberately different movements (squat, basketball jump
+shot, golf swing). Progress so far:
 
-- [`docs/research.md`](docs/research.md) — comparison of pose-estimation
-  engines (MediaPipe/BlazePose, MoveNet, MMPose/RTMPose) and reference
-  projects (Sports2D, Pose2Sim, OpenCap), plus DTW alignment and action
-  quality assessment (AQA) prior art.
-- [`docs/open-source-audit.md`](docs/open-source-audit.md) — license and
-  reuse verdict for every project/library evaluated.
-- [`docs/architecture.md`](docs/architecture.md) — the sport-agnostic
-  system design: `PoseProvider` abstraction, `MotionTemplate` plugin
-  system, the CV → rule engine → LLM separation, temporal/spatial
-  alignment, and ghost-overlay visualization.
-- [`docs/data-model.md`](docs/data-model.md) — the normalized
-  `MotionSequence` schema and everything downstream of it (`Finding`,
-  `Correction`, `AlignmentMap`, `MotionComparison`).
-- [`docs/mvp-plan.md`](docs/mvp-plan.md) — V0 milestones, demonstrated
-  against three deliberately different movements (squat, basketball jump
-  shot, golf swing) to test whether the engine is genuinely sport-agnostic.
+- **M0** — Next.js/FastAPI scaffolding, `PoseProvider`/`StorageProvider`/
+  `AlignmentEngine` interfaces.
+- **M1** — Browser-side MediaPipe pose extraction + skeleton overlay,
+  camera guidance per sport, record-or-upload UI.
+- **M2** — `MotionSequence` construction: joint/segment angles, a
+  zero-phase Butterworth filter, centers, velocity/acceleration.
+- **M3** — Generic `PhaseDetector`, driven entirely by each sport's
+  `template.json` (no per-sport code).
+- **M4** — Rule engine (`EvaluationRule` → `Finding`) and correction
+  engine (`Finding` → primary `Correction`), with a small authored
+  cue/drill library per sport.
+- **M5** — Second ("after") recording, and DTW-based temporal alignment
+  (windowed, phase-seeded, via `dtaidistance`) running server-side, plus
+  spatial normalization (`SpatialAligner`) for the M6 overlay to consume.
 
-## Planned Tech Stack
+Remaining: **M6** (ghost-overlay/diff/motion-trail visualization), **M7**
+(cross-sport validation pass with a 4th, unplanned movement).
+
+See `docs/` for the original research/architecture/data-model docs this
+was built from.
+
+## Running Locally
+
+**Frontend** (Next.js):
+
+```bash
+npm install       # also runs scripts/setup-mediapipe-assets.mjs (postinstall)
+npm run dev        # http://localhost:3000 (or PORT=xxxx npm run dev)
+npm test           # vitest — unit tests for the motion/rules pipeline
+npm run typecheck
+```
+
+**Backend** (FastAPI — only needed once you get to the M5 alignment
+step; M1–M4 run entirely in the browser):
+
+```bash
+cd backend
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+.venv/bin/uvicorn app.main:app --reload   # http://localhost:8000
+.venv/bin/pytest                          # backend/tests/
+```
+
+The frontend calls the backend at `NEXT_PUBLIC_API_BASE_URL`
+(default `http://localhost:8000`) only for `/align`.
+
+## Tech Stack
 
 - **Frontend**: Next.js, TypeScript, Tailwind CSS
 - **Backend**: Python, FastAPI
-- **Computer vision**: MediaPipe Pose (V0), OpenCV, NumPy, SciPy
+- **Computer vision**: MediaPipe Pose (self-hosted WASM/model assets —
+  see `scripts/setup-mediapipe-assets.mjs`)
 - **Alignment**: `dtaidistance` (windowed, phase-seeded DTW)
-- **Storage**: local filesystem behind a `StorageProvider` interface (POC),
-  cloud-ready later
+- **Storage**: not yet needed — no video is persisted (analysis runs
+  entirely from the in-memory recording); a `StorageProvider` interface
+  exists for when that changes
 
 ## Non-Goals for V0
 

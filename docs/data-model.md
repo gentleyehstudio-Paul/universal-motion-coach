@@ -52,6 +52,10 @@ interface MotionSequence {
   fps: number;
   duration: number;                 // seconds
   frameCount: number;
+  videoWidth: number;                // source video's natural pixel dimensions —
+  videoHeight: number;               // needed to re-derive pixel-space geometry from
+                                      // the normalized [0,1] coordinates below (see
+                                      // SpatialAligner, architecture.md §3.7)
 
   landmarks: CommonSkeletonFrame[]; // raw-to-normalized per-frame joints
   jointAngles: JointAngleFrame[];

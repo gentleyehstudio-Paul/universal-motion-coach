@@ -97,7 +97,7 @@ export function buildMotionSequence(input: BuildMotionSequenceInput): MotionSequ
     y: p.y / videoHeight,
   });
 
-  const phases: DetectedPhase[] = []; // populated by the M3 PhaseDetector, not yet implemented
+  const phases: DetectedPhase[] = []; // caller runs detectPhases() separately and assigns it in
 
   return {
     id: input.id,
@@ -106,6 +106,8 @@ export function buildMotionSequence(input: BuildMotionSequenceInput): MotionSequ
     fps,
     duration,
     frameCount: frames.length,
+    videoWidth,
+    videoHeight,
     landmarks: frames,
     jointAngles,
     segmentAngles,

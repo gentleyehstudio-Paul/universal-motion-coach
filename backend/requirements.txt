@@ -1,6 +1,11 @@
 fastapi>=0.111
 uvicorn[standard]>=0.30
 pydantic>=2.7
+numpy>=1.26
+dtaidistance>=2.3
 
-# Added starting M2 (motion representation) / M5 (alignment):
-# numpy, scipy, opencv-python-headless, dtaidistance, rtmlib
+# Added starting M2 (motion representation): opencv-python-headless,
+# scipy — not yet needed since M2-M4 run entirely client-side.
+
+# Dev/test only:
+pytest>=8.0
