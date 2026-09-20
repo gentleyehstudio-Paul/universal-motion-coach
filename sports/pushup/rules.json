@@ -1,0 +1,44 @@
+{
+  "evaluationRules": [
+    {
+      "id": "pushup.insufficient_depth",
+      "issueId": "pushup.insufficient_depth",
+      "qualityDimension": "completeness",
+      "phase": "bottom",
+      "metric": { "signal": "joint_angle.left_elbow_flexion", "aggregation": "min" },
+      "baselineSource": "biomechanical_rule",
+      "baselineValue": 100,
+      "comparison": "greater_than",
+      "unit": "degrees",
+      "severityBands": { "mild": 10, "moderate": 20, "severe": 35 }
+    },
+    {
+      "id": "pushup.hip_sag",
+      "issueId": "pushup.hip_sag",
+      "qualityDimension": "alignment",
+      "phase": "bottom",
+      "metric": { "signal": "joint_angle.left_hip_flexion", "aggregation": "min" },
+      "baselineSource": "biomechanical_rule",
+      "baselineValue": 160,
+      "comparison": "less_than",
+      "unit": "degrees",
+      "severityBands": { "mild": 10, "moderate": 25, "severe": 40 }
+    }
+  ],
+  "corrections": {
+    "pushup.insufficient_depth": {
+      "what": "You're not reaching a full push-up depth.",
+      "why": "Stopping short of a 90° elbow bend gives your chest and triceps less time under tension, making the push-up less effective.",
+      "whatToChange": "Lower until your elbows reach roughly 90°, or your chest nears the floor, before pushing back up.",
+      "cue": "Chest to the floor, not just your head.",
+      "drill": "Push-ups to a target (a small object under your chest) so you get consistent feedback on depth."
+    },
+    "pushup.hip_sag": {
+      "what": "Your hips are sagging during the push-up.",
+      "why": "Letting the hips drop breaks the straight-body plank position, shifting load into your lower back instead of your core and chest.",
+      "whatToChange": "Brace your core and squeeze your glutes to keep a straight line from shoulders to ankles.",
+      "cue": "Body like a plank, not a banana.",
+      "drill": "Hold a plank for 20-30 seconds right before your push-up set to prime the same bracing pattern."
+    }
+  }
+}

@@ -142,6 +142,38 @@ provider's native format.
 - **Exit criteria**: push-up runs through the same pipeline via config
   only, or a documented list of exactly what had to change and why.
 
+**Outcome (done): zero core-pipeline code changes.** Push-up was added
+as `sports/pushup/{template.json,rules.json}` plus the two designated
+lines in `lib/template/registry.ts` (the touchpoint that file's own
+comment has named since M4) — nothing in `build-sequence.ts`,
+`phase-detector.ts`, `evaluate.ts`, `generate.ts` (correction), or any
+rendering component changed. Verified with the same rigor as the squat
+fixture (`lib/motion/pushup-cross-sport.test.ts`, 9 tests over a
+synthetic forward-kinematics push-up fixture): phase detection finds all
+5 configured phases from `landmark.left_shoulder.y` alone, and both
+rules fire independently and correctly (`insufficient_depth` on a
+shallow rep, `hip_sag` on a sagging one).
+
+Two things the exercise actually validated, not just failed to break:
+- **`visualization.rotationNormalization` needed to be `false`, and this
+  is a config choice, not a workaround.** Squat/basketball/golf all keep
+  the torso roughly vertical, so SpatialAligner's optional rotate-to-
+  vertical (M5) was never stressed by a movement where that's the wrong
+  frame. A push-up's body is horizontal — rotating it "upright" would
+  visibly wreck the ghost overlay. Setting the flag `false` (already a
+  documented per-template option, docs/architecture.md §3.7) is the
+  correct fix, and it lives entirely in `template.json`.
+- **`left_hip_flexion` — computed generically since M2, unused by all
+  three original sports — turned out to be exactly what push-up's
+  hip-sag rule needed**, with no new geometry code. This is the
+  "generic angle toolkit, a sport picks what it needs" design
+  (docs/architecture.md §3.3) actually generalizing to an unplanned
+  sport, not merely being coincidentally sufficient for the three it was
+  built against.
+
+This is the last MVP milestone (M0-M7 all complete) — see the repo
+README for current status.
+
 ## Explicit Non-Goals for V0
 
 - No aggregate performance score.

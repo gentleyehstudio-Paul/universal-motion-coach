@@ -1,0 +1,58 @@
+{
+  "sportId": "pushup",
+  "displayName": "Push-up",
+  "cameraGuidance": {
+    "angle": "Side-on (90° to your body), camera at floor/chest height",
+    "distance": "Far enough to see your full body from shoulders to feet",
+    "orientation": "side"
+  },
+  "phases": [
+    {
+      "name": "top",
+      "primarySignal": "landmark.left_shoulder.y",
+      "entryCondition": { "type": "sequence_boundary" },
+      "exitCondition": { "type": "velocity_sign_change" }
+    },
+    {
+      "name": "descent",
+      "primarySignal": "landmark.left_shoulder.y",
+      "entryCondition": { "type": "velocity_sign_change" },
+      "exitCondition": { "type": "local_max" }
+    },
+    {
+      "name": "bottom",
+      "primarySignal": "landmark.left_shoulder.y",
+      "entryCondition": { "type": "local_max" },
+      "exitCondition": { "type": "velocity_sign_change" }
+    },
+    {
+      "name": "ascent",
+      "primarySignal": "landmark.left_shoulder.y",
+      "entryCondition": { "type": "velocity_sign_change" },
+      "exitCondition": { "type": "local_min" }
+    },
+    {
+      "name": "top_end",
+      "primarySignal": "landmark.left_shoulder.y",
+      "entryCondition": { "type": "local_min" },
+      "exitCondition": { "type": "sequence_boundary" }
+    }
+  ],
+  "keyJoints": [
+    "left_shoulder", "right_shoulder", "left_elbow", "right_elbow",
+    "left_wrist", "right_wrist", "left_hip", "right_hip", "left_knee", "right_knee"
+  ],
+  "relevantAngles": ["left_elbow_flexion", "right_elbow_flexion", "left_hip_flexion"],
+  "temporalRelationships": [
+    { "before": "top", "after": "descent" },
+    { "before": "descent", "after": "bottom" },
+    { "before": "bottom", "after": "ascent" },
+    { "before": "ascent", "after": "top_end" }
+  ],
+  "evaluationRuleIds": ["pushup.insufficient_depth", "pushup.hip_sag"],
+  "visualization": {
+    "anchor": "hip",
+    "rotationNormalization": false,
+    "trailJoints": ["left_shoulder", "left_hip"]
+  }
+}

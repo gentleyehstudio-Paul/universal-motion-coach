@@ -5,11 +5,11 @@ identify what to fix, show the correction, record again, and visually
 overlay before/after motion to make invisible movement differences
 visible.
 
-## Status: Phase 2 (MVP implementation) — M0–M6 of 7 done
+## Status: Phase 2 (MVP implementation) — M0–M7 of 7 done, MVP complete
 
 See [`docs/mvp-plan.md`](docs/mvp-plan.md) for the full milestone plan
 against three deliberately different movements (squat, basketball jump
-shot, golf swing). Progress so far:
+shot, golf swing), plus a 4th validation sport. Progress:
 
 - **M0** — Next.js/FastAPI scaffolding, `PoseProvider`/`StorageProvider`/
   `AlignmentEngine` interfaces.
@@ -32,12 +32,17 @@ shot, golf swing). Progress so far:
   `ResultSection` with timing-change and primary-correction summaries.
   See `/dev/ghost-preview` for a synthetic-data preview that doesn't
   need a camera.
+- **M7** — Cross-sport validation: added push-up (`sports/pushup/`) as
+  an unplanned 4th movement, as a hard test of the sport-agnostic claim.
+  **Result: zero core-pipeline code changed** — only the config files
+  and the two lines in `lib/template/registry.ts` that file's own
+  comment has designated as the sport-registration touchpoint since M4.
+  See `docs/mvp-plan.md`'s M7 section for what that exercise actually
+  validated (not just failed to break).
 
-Remaining: **M7** (cross-sport validation pass with a 4th, unplanned
-movement, as a hard test of the sport-agnostic architecture).
-
-See `docs/` for the original research/architecture/data-model docs this
-was built from.
+All 7 MVP milestones from `docs/mvp-plan.md` are now done. See `docs/`
+for the original research/architecture/data-model docs this was built
+from.
 
 ## Running Locally
 
