@@ -10,6 +10,7 @@ import { MotionAnalysisPanel } from "@/components/MotionAnalysisPanel";
 import { PrimaryCorrectionCard } from "@/components/PrimaryCorrectionCard";
 import { AlignmentSummaryPanel } from "@/components/AlignmentSummaryPanel";
 import { BeforeAfterComparison } from "@/components/BeforeAfterComparison";
+import { ResultSection } from "@/components/ResultSection";
 import { analyzeAttempt, type AnalyzedAttempt } from "@/lib/pipeline/analyze-attempt";
 import { measureRule } from "@/lib/rules/evaluate";
 import { fastApiAlignmentEngine } from "@/lib/alignment/align-client";
@@ -189,6 +190,18 @@ export default function RecordPage({
           )}
           {alignment && <AlignmentSummaryPanel alignment={alignment} />}
         </div>
+      )}
+
+      {/* Stage 4: the actual product result screen (docs/mvp-plan.md M6) */}
+      {before && after && alignment && (
+        <ResultSection
+          template={template}
+          beforeSequence={before.result.sequence}
+          afterSequence={after.result.sequence}
+          alignment={alignment}
+          primary={before.result.primary}
+          primaryAfterValue={comparisonAfterValue}
+        />
       )}
     </main>
   );

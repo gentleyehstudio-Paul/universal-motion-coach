@@ -5,7 +5,7 @@ identify what to fix, show the correction, record again, and visually
 overlay before/after motion to make invisible movement differences
 visible.
 
-## Status: Phase 2 (MVP implementation) — M0–M5 of 7 done
+## Status: Phase 2 (MVP implementation) — M0–M6 of 7 done
 
 See [`docs/mvp-plan.md`](docs/mvp-plan.md) for the full milestone plan
 against three deliberately different movements (squat, basketball jump
@@ -25,9 +25,16 @@ shot, golf swing). Progress so far:
 - **M5** — Second ("after") recording, and DTW-based temporal alignment
   (windowed, phase-seeded, via `dtaidistance`) running server-side, plus
   spatial normalization (`SpatialAligner`) for the M6 overlay to consume.
+- **M6** — `GhostOverlayView` (play/pause/scrub/frame-step/slow-motion,
+  opacity slider, optional motion trails) and `DifferenceView`
+  (per-joint displacement arrows + measured deltas) — the two view modes
+  the product brief calls non-negotiable for V0 — assembled into a
+  `ResultSection` with timing-change and primary-correction summaries.
+  See `/dev/ghost-preview` for a synthetic-data preview that doesn't
+  need a camera.
 
-Remaining: **M6** (ghost-overlay/diff/motion-trail visualization), **M7**
-(cross-sport validation pass with a 4th, unplanned movement).
+Remaining: **M7** (cross-sport validation pass with a 4th, unplanned
+movement, as a hard test of the sport-agnostic architecture).
 
 See `docs/` for the original research/architecture/data-model docs this
 was built from.
