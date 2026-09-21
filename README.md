@@ -68,6 +68,40 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 The frontend calls the backend at `NEXT_PUBLIC_API_BASE_URL`
 (default `http://localhost:8000`) only for `/align`.
 
+## Deploying (for real-device/phone testing)
+
+Camera access (`getUserMedia`) requires HTTPS on a phone browser, so
+testing on an actual device needs a real deployment, not just
+`localhost`. There's no CLI/one-command deploy set up — both steps use
+each platform's "Import from GitHub" flow in their web dashboard:
+
+1. **Backend → Railway** (or Render/Fly/any Python host):
+   - New Project → Deploy from GitHub → select this repo.
+   - Set **Root Directory** to `backend`. `railway.json`/`Procfile` in
+     that directory already specify the start command
+     (`uvicorn app.main:app --host 0.0.0.0 --port $PORT`); Railway's
+     Nixpacks builder auto-detects Python from `requirements.txt`.
+   - Once deployed, copy the public URL Railway gives you
+     (`https://<something>.up.railway.app`).
+   - Set an `ALLOWED_ORIGINS` env var on this service to the Vercel URL
+     from step 2 (comma-separated if you need more than one origin) —
+     the backend's CORS defaults to localhost only otherwise.
+
+2. **Frontend → Vercel**:
+   - New Project → Import this GitHub repo. Vercel auto-detects Next.js;
+     no config file needed.
+   - Set the `NEXT_PUBLIC_API_BASE_URL` env var to the Railway URL from
+     step 1, then redeploy (env var changes need a redeploy to take
+     effect).
+   - Vercel's build runs `npm install`, which runs
+     `scripts/setup-mediapipe-assets.mjs` (postinstall) — this needs
+     outbound network access to `storage.googleapis.com` to download the
+     pose model once; Vercel's build environment has normal internet
+     access, so this just works.
+
+Once both are live, open the Vercel URL on your phone — it's a real
+HTTPS site, so camera permission prompts work normally.
+
 ## Tech Stack
 
 - **Frontend**: Next.js, TypeScript, Tailwind CSS
