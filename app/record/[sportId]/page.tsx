@@ -36,6 +36,7 @@ export default function RecordPage({
   const [alignment, setAlignment] = useState<AlignmentMap | null>(null);
   const [aligning, setAligning] = useState(false);
   const [alignError, setAlignError] = useState<string | null>(null);
+  const [analysisWarning, setAnalysisWarning] = useState<string | null>(null);
   const framesRef = useRef<CommonSkeletonFrame[]>([]);
 
   useEffect(() => {
@@ -60,6 +61,7 @@ export default function RecordPage({
 
   const handleVideoReady = (src: string) => {
     framesRef.current = [];
+    setAnalysisWarning(null);
     setPendingVideoSrc(src);
   };
 
@@ -67,7 +69,13 @@ export default function RecordPage({
     videoWidth: number,
     videoHeight: number
   ) => {
-    if (framesRef.current.length === 0 || !pendingVideoSrc || !template || !ruleSet) return;
+    if (!pendingVideoSrc || !template || !ruleSet) return;
+    if (framesRef.current.length === 0) {
+      setAnalysisWarning(
+        "No pose was detected in this clip, so analysis couldn't run. Make sure your full body is visible and well-lit, then try again."
+      );
+      return;
+    }
     const result = analyzeAttempt(framesRef.current, videoWidth, videoHeight, template, ruleSet);
     const attempt: Attempt = { videoSrc: pendingVideoSrc, result };
     if (stage === "before") {
@@ -105,6 +113,9 @@ export default function RecordPage({
               <p className="text-xs text-neutral-500">
                 Play the clip through to the end to run motion analysis.
               </p>
+              {analysisWarning && (
+                <p className="text-sm text-amber-400">{analysisWarning}</p>
+              )}
               <button
                 onClick={startRecording}
                 className="self-start text-sm text-neutral-400 underline hover:text-neutral-200"
@@ -149,6 +160,9 @@ export default function RecordPage({
                   <p className="text-xs text-neutral-500">
                     Play the clip through to the end to run motion analysis.
                   </p>
+                  {analysisWarning && (
+                    <p className="text-sm text-amber-400">{analysisWarning}</p>
+                  )}
                 </div>
               )}
             </div>

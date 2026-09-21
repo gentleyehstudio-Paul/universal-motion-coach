@@ -55,6 +55,16 @@ export function PoseTrackedVideo({ src, onFrame, onPlaybackEnded }: PoseTrackedV
 
     let rafId: number;
     let stopped = false;
+    // MediaPipe's detectForVideo requires a strictly increasing timestamp
+    // between calls, or it throws. requestAnimationFrame can fire faster
+    // than video.currentTime actually advances (especially early in
+    // playback, or on variable-frame-rate phone-recorded footage), which
+    // produces a repeated or non-increasing timestamp and — without this
+    // guard — silently kills the whole extraction loop for the rest of
+    // the clip the first time it happens (an uncaught rejection inside
+    // this async function means the trailing requestAnimationFrame call
+    // never runs), which looked like "playing the video does nothing."
+    let lastTimestampMs = -1;
 
     const syncCanvasSize = () => {
       canvas.width = video.clientWidth;
@@ -68,17 +78,19 @@ export function PoseTrackedVideo({ src, onFrame, onPlaybackEnded }: PoseTrackedV
       }
       syncCanvasSize();
       const ctx = canvas.getContext("2d");
-      if (ctx && provider) {
-        const frame = await provider.extract(
-          video,
-          frameIndexRef.current,
-          video.currentTime * 1000
-        );
-        if (frame) {
-          drawSkeleton(ctx, frame, canvas.width, canvas.height);
-          onFrame?.(frame);
+      const timestampMs = video.currentTime * 1000;
+      if (ctx && provider && timestampMs > lastTimestampMs) {
+        lastTimestampMs = timestampMs;
+        try {
+          const frame = await provider.extract(video, frameIndexRef.current, timestampMs);
+          if (frame) {
+            drawSkeleton(ctx, frame, canvas.width, canvas.height);
+            onFrame?.(frame);
+          }
+          frameIndexRef.current += 1;
+        } catch (err) {
+          console.error("Pose extraction failed for a frame, skipping:", err);
         }
-        frameIndexRef.current += 1;
       }
       rafId = requestAnimationFrame(loop);
     };
