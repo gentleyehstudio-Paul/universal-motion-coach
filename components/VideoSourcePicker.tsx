@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface VideoSourcePickerProps {
   onVideoReady: (src: string) => void;
@@ -33,6 +33,19 @@ export function VideoSourcePicker({ onVideoReady }: VideoSourcePickerProps) {
   const previewRef = useRef<HTMLVideoElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const streamRef = useRef<MediaStream | null>(null);
+
+  // The preview <video> only exists in the DOM once mode === "recording",
+  // so wiring it up has to happen after that state flip re-renders —
+  // doing it inline in startRecording (before setMode) finds previewRef
+  // still null and silently no-ops, which is what made the live preview
+  // stay black even though the recording itself worked fine.
+  useEffect(() => {
+    if (mode === "recording" && previewRef.current && streamRef.current) {
+      previewRef.current.srcObject = streamRef.current;
+      previewRef.current.play().catch(() => {});
+    }
+  }, [mode]);
 
   const startRecording = async () => {
     setError(null);
@@ -41,10 +54,7 @@ export function VideoSourcePicker({ onVideoReady }: VideoSourcePickerProps) {
         video: { facingMode: "environment" },
         audio: false,
       });
-      if (previewRef.current) {
-        previewRef.current.srcObject = stream;
-        await previewRef.current.play();
-      }
+      streamRef.current = stream;
       chunksRef.current = [];
       const mimeType = pickSupportedMimeType();
       const recordedType = mimeType ?? "video/webm";
