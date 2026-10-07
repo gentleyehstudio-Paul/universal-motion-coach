@@ -1,0 +1,10 @@
+{
+  "name": "monster-lab",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.mjs",
+    "check": "node check.mjs && node check-ai.mjs && node check-access.mjs"
+  }
+}

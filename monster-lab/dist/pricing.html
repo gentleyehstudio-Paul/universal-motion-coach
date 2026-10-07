@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080908">
+  <title>方案與價格 — Moster Lab</title>
+  <meta name="description" content="Moster Lab 方案：優惠碼免費體驗、月費制 NT$399、專案陪跑 NT$1,500。">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2714%27 fill=%27%23080908%27 stroke=%27%239c9f99%27/%3E%3Ctext x=%2716%27 y=%2721%27 text-anchor=%27middle%27 font-size=%2714%27 fill=%27%23f1f1ec%27 font-family=%27Arial%27%3EM%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/landing.css?v=launch-8">
+  <link rel="stylesheet" href="/pricing.css?v=1">
+</head>
+<body>
+  <header class="site-header">
+    <a class="wordmark" href="/" aria-label="Moster Lab home"><span class="mark">M</span><span>MOSTER <span class="wordmark-light">LAB</span></span></a>
+    <nav aria-label="Main navigation">
+      <a href="/#studio">Studio</a>
+      <a href="/pricing" aria-current="page">方案</a>
+      <a class="nav-cta" href="/app/">ENTER THE LAB <span>↗</span></a>
+    </nav>
+    <button class="menu-toggle" aria-label="Open navigation" aria-expanded="false"><span></span><span></span></button>
+  </header>
+  <main class="pricing">
+    <div class="micro-label"><span>PLANS</span><span>NT$ · 新台幣</span></div>
+    <h1>先免費看一次，<br><span>再決定怎麼練。</span></h1>
+    <p class="lead">影片回放與骨架分析永遠免費、在你的裝置上完成。AI 影片分析依方案計次。</p>
+
+    <section class="plans" aria-label="方案">
+      <article class="plan" id="plan-trial">
+        <span class="tag">FREE · 單次</span>
+        <h2>優惠碼體驗</h2>
+        <p class="price"><b>NT$0</b></p>
+        <ul><li>輸入優惠碼，免費 1 次 AI 影片分析</li><li>每組優惠碼只能分析一次</li><li>不需註冊帳號</li></ul>
+        <form id="redeemForm" class="redeem" autocomplete="off">
+          <label for="redeemInput">優惠碼</label>
+          <div class="row"><input id="redeemInput" placeholder="MOSTER-XXXXXXXX-XXXX" spellcheck="false"><button type="submit">兌換</button></div>
+          <small id="redeemNote" role="status"></small>
+        </form>
+      </article>
+
+      <article class="plan featured" id="plan-monthly">
+        <span class="tag">MONTHLY</span>
+        <h2>月費方案</h2>
+        <p class="price"><b>NT$399</b><span> / 月</span></p>
+        <ul><li>每月 30 次 AI 影片分析（公平使用上限）</li><li>投籃、揮桿皆可使用</li><li>隨時可停止，不綁約</li></ul>
+        <a class="cta" data-cta="monthly" href="#">即將開放</a>
+      </article>
+
+      <article class="plan" id="plan-project">
+        <span class="tag">PROJECT · 真人陪跑</span>
+        <h2>專案陪跑</h2>
+        <p class="price"><b>NT$1,500</b><span> / 專案</span></p>
+        <ul><li>真人到場協助架設攝影機</li><li>現場協助你練習與回看影片</li><li>附 60 天 AI 分析權限</li><li>不含場地費用</li></ul>
+        <a class="cta" data-cta="project" href="#">預約洽談</a>
+      </article>
+    </section>
+
+    <section class="have-code" aria-label="已有存取碼">
+      <h2>已經是會員？</h2>
+      <p id="accessState">貼上你收到的存取碼即可啟用。</p>
+      <form id="ticketForm" class="redeem" autocomplete="off"><div class="row"><input id="ticketInput" placeholder="貼上存取碼" spellcheck="false"><button type="submit">啟用</button></div><small id="ticketNote" role="status"></small></form>
+    </section>
+
+    <p class="fine">AI 分析為依影片取樣畫面的觀察建議，不是醫療或傷害診斷。分析時才會把你同意送出的縮小畫面傳給 OpenAI；整段影片與音訊不會上傳。</p>
+  </main>
+  <footer><a class="wordmark" href="/"><span class="mark">M</span><span>MOSTER <span class="wordmark-light">LAB</span></span></a><span>ANALYZE · IMPROVE · LIVE BETTER</span><span>© MOSTER LAB</span></footer>
+  <script type="module" src="/pricing.js?v=1"></script>
+  <script src="/landing.js?v=launch-3" defer></script>
+</body>
+</html>

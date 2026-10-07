@@ -1,0 +1,37 @@
+import assert from 'node:assert/strict';
+import {validateFrames,validateReview,editPrompt} from './ai-policy.mjs';
+import {validSequence,localEvidence} from './dist/coach-core.mjs';
+const frames=[0,1,2].map(time=>({time,image:'data:image/jpeg;base64,/9j/2Q=='}));
+const motion=[0,1,2].map(time=>[time,null,null,null,null]);
+assert.ok(validSequence(frames));assert.equal(validSequence([frames[1],frames[0],frames[2]]),false);
+assert.throws(()=>validateFrames({sport:'basketball',hand:'right',view:'side',frames:[frames[0],frames[0],frames[2]]}));
+assert.throws(()=>validateFrames({sport:'basketball',hand:'right',view:'side',frames:frames.map(f=>({...f,image:'https://example.com/private'}))}));
+const raw={summary:'test',observations:[{phase:1,observation:'visible',evidence:'frame 1',confidence:'medium'}],uncertainties:['需確認'],corrections:[{phase:1,observationIndex:0,actionable:true,confidence:'medium',evidence:'frame 1',instruction:'small edit',title:'test',point:[.5,.5]}]};
+assert.equal(validateReview(raw).corrections.length,1);
+assert.ok(validateReview({...raw,corrections:[]},'basketball').practice.instruction.includes('投籃'));
+assert.ok(validateReview({...raw,corrections:[]},'golf').practice.instruction.includes('半揮桿'));
+assert.equal(validateReview({...raw,corrections:[{...raw.corrections[0],bodyPart:'elbow'}]}).corrections[0].bodyPart,'elbow');
+assert.equal(validateReview({...raw,corrections:[{...raw.corrections[0],bodyPart:'unknown'}]}).corrections[0].bodyPart,'unknown');
+assert.equal(validateReview({...raw,observations:[{...raw.observations[0],kind:'strength'}]}).observations[0].kind,'strength');
+assert.equal(validateReview({...raw,observations:[{...raw.observations[0],kind:'unsupported'}]}).observations[0].kind,'neutral');
+assert.equal(validateReview({...raw,corrections:raw.corrections.map(c=>({...c,phase:2}))}).corrections.length,0);
+assert.equal(validateReview({...raw,corrections:raw.corrections.map(c=>({...c,actionable:false}))}).corrections.length,0);
+assert.equal(validateReview({...raw,observations:[{...raw.observations[0],confidence:'low'}]}).corrections.length,0);
+assert.equal(validateReview({...raw,corrections:[...raw.corrections,...raw.corrections,...raw.corrections]}).corrections.length,2);
+assert.throws(()=>editPrompt({sport:'basketball',review:validateReview(raw)},0));
+assert.ok(localEvidence(frames,'front','basketball').some(s=>s.includes('需確認')));
+console.log('PASS: phase order, image validation, uncertainty gating, two-edit cap, no unsupported phase editing.');
+process.env.OPENAI_API_KEY='fixture-not-a-real-key';process.env.PORT='18765';
+const network=global.fetch;let calls=0;global.fetch=async(url,options)=>{if(!String(url).startsWith('https://api.openai.com/'))return network(url,options);calls++;return new Response(JSON.stringify(String(url).endsWith('responses')?{output:[{content:[{type:'output_text',text:JSON.stringify(raw)}]}]}:{data:[{b64_json:'fixture-image'}]}),{status:200});};
+const {server}=await import('./server.mjs');await new Promise(r=>server.listen(18765,'127.0.0.1',r));
+const post=(path,payload,extra={})=>network('http://127.0.0.1:18765'+path,{method:'POST',headers:{Origin:'http://127.0.0.1:18765','Content-Type':'application/json','X-Motion-Lab':'1',...extra},body:JSON.stringify(payload)});
+try{
+ assert.equal((await network('http://127.0.0.1:18765/.env')).status,404);
+ assert.equal((await post('/api/review',{},{Origin:'https://other.example'})).status,403);
+ assert.equal((await post('/api/review',{consent:false})).status,400);assert.equal(calls,0);
+ const reviewed=await post('/api/review',{sport:'basketball',hand:'right',view:'side',frames,motion,duration:3,consent:true});assert.equal(reviewed.status,200);const job=await reviewed.json();
+ assert.equal((await post('/api/generate',{id:job.id,phase:0,consent:true})).status,400);assert.equal(calls,1);
+ const generated=await post('/api/generate',{id:job.id,phase:1,image:frames[1].image,consent:true});assert.equal(generated.status,200);assert.ok((await generated.json()).image.startsWith('data:image/png;base64,'));
+ assert.equal((await post('/api/generate',{id:job.id,phase:1,image:frames[1].image,consent:true})).status,400);assert.equal(calls,2);
+ console.log('PASS: local API origin protection, file allowlist, consent, review/edit flow, evidence gating and duplicate-call protection (mock upstream).');
+}finally{global.fetch=network;await new Promise(r=>server.close(r));}
