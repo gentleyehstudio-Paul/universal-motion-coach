@@ -6,13 +6,15 @@ import {validateFrames,validateReview,REVIEW_PROMPT,editPrompt} from './ai-polic
 import {createHandlers} from './access/handlers.mjs';
 import {memoryStore,storeFromEnv} from './access/store.mjs';
 import {makeCallModel,loadKnowledge} from './access/model.mjs';
+import {resendMailer} from './access/mail.mjs';
 const root=new URL('./dist/',import.meta.url),port=Number(process.env.PORT||8765),origin=`http://127.0.0.1:${port}`;
 const basketballKnowledge=await loadKnowledge();
 const key=process.env.OPENAI_API_KEY;
 // Local default is 'open' (owner use, unchanged). Set ML_ACCESS_MODE=enforced + ACCESS_SECRET to test tickets locally.
 const accessMode=process.env.ML_ACCESS_MODE==='enforced'?'enforced':'open';
-const handlers=createHandlers({env:process.env,store:accessMode==='enforced'?(process.env.UPSTASH_REDIS_REST_URL?storeFromEnv():{...memoryStore(),persistent:true}):memoryStore(),mode:accessMode,callModel:makeCallModel(process.env,basketballKnowledge)});
-const hdrs=req=>({authorization:req.headers.authorization||''});const jobs=new Map();let active=false;
+const handlers=createHandlers({env:process.env,store:accessMode==='enforced'?(process.env.UPSTASH_REDIS_REST_URL?storeFromEnv():{...memoryStore(),persistent:true}):memoryStore(),mode:accessMode,mail:resendMailer(process.env),devLogin:process.env.ML_DEV_LOGIN==='1'?origin:'',callModel:makeCallModel(process.env,basketballKnowledge)});
+const hdrs=req=>({cookie:req.headers.cookie||'',authorization:req.headers.authorization||'','x-forwarded-for':'','stripe-signature':req.headers['stripe-signature']||''});
+const routes={'/api/redeem':'redeem','/api/auth/request':'authRequest','/api/auth/verify':'authVerify','/api/auth/logout':'logout','/api/checkout':'checkout','/api/portal':'portal'};const jobs=new Map();let active=false;
 const models={review:process.env.OPENAI_VISION_MODEL||'gpt-6-astra',image:process.env.OPENAI_IMAGE_MODEL||'gpt-image-2.5-sunburst'};
 function send(res,status,data){res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify(data));}
 async function body(req){let text='';for await(const chunk of req){text+=chunk;if(text.length>15000000)throw new Error('畫面資料過大。');}return JSON.parse(text);}
@@ -24,9 +26,9 @@ export const server=http.createServer(async(req,res)=>{
  if(path==='/api/status'&&req.method==='GET'){const r=await handlers.status({headers:hdrs(req)});send(res,r.status,{...r.body,models});return;}
  if(path.startsWith('/api/')){
   if(req.method!=='POST'||req.headers.origin!==origin||req.headers['x-motion-lab']!=='1'||!(req.headers['content-type']||'').startsWith('application/json')){send(res,403,{error:'請由 Motion Lab 本機介面發送。'});return;}
-  if(!key&&path!=='/api/redeem'){send(res,503,{error:'尚未設定伺服器 OPENAI_API_KEY；未傳送任何畫面。'});return;}
+  if(!key&&path==='/api/review'||!key&&path==='/api/generate'){send(res,503,{error:'尚未設定伺服器 OPENAI_API_KEY；未傳送任何畫面。'});return;}
+  if(routes[path]){try{const r=await handlers[routes[path]]({headers:hdrs(req),body:await body(req)});if(r.cookies)res.setHeader('Set-Cookie',r.cookies);send(res,r.status,r.body);}catch(e){send(res,e.expose?500:400,{error:e.message});}return;}
   if(active){send(res,409,{error:'已有一個 AI 工作正在處理，請等待完成。'});return;}
-  if(path==='/api/redeem'){try{const r=await handlers.redeem({body:await body(req)});send(res,r.status,r.body);}catch(e){send(res,400,{error:e.message});}return;}
   if(path==='/api/review'&&accessMode==='enforced'){active=true;try{const r=await handlers.review({headers:hdrs(req),body:await body(req)});send(res,r.status,r.body);}catch(e){send(res,400,{error:e.message});}finally{active=false;}return;}
   active=true;
   try{const b=await body(req);if(b.consent!==true)throw new Error('必須先同意將選取畫面送至 OpenAI。');
@@ -46,7 +48,7 @@ export const server=http.createServer(async(req,res)=>{
  }
  if(req.method!=='GET'&&req.method!=='HEAD'){res.writeHead(405);res.end();return;}
  // Fixed allowlist: keys, source and local files are never served.
- const name=path==='/'?'index.html':path==='/pricing'?'pricing.html':(['/app','/app/'].includes(path)?'app/index.html':path.slice(1));const allowed=['index.html','app/index.html','app.js','metrics.mjs','graphic.mjs','coach.mjs','coach-core.mjs','style.css','landing.css','landing.js','access.mjs','pricing.html','pricing.css','pricing.js','banner1006-2.png','moster-banner3.png','moster-banner4.png'];
+ const name=path==='/'?'index.html':path==='/pricing'?'pricing.html':path==='/login'?'login.html':(['/app','/app/'].includes(path)?'app/index.html':path.slice(1));const allowed=['index.html','app/index.html','app.js','metrics.mjs','graphic.mjs','coach.mjs','coach-core.mjs','style.css','landing.css','landing.js','access.mjs','login.html','login.js','pricing.html','pricing.css','pricing.js','banner1006-2.png','moster-banner3.png','moster-banner4.png'];
  if(!allowed.includes(name)){res.writeHead(404);res.end();return;}
  try{const data=await readFile(new URL(name,root));res.writeHead(200,{'Content-Type':name.endsWith('.html')?'text/html; charset=utf-8':name.endsWith('.css')?'text/css':name.endsWith('.png')?'image/png':'application/javascript','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'});res.end(req.method==='HEAD'?undefined:data);}catch{res.writeHead(404);res.end();}
 });

@@ -26,3 +26,6 @@ body{font-family:Manrope,'Noto Sans TC',sans-serif}
 .have-code h2{font:600 18px Manrope,'Noto Sans TC',sans-serif;margin:0 0 6px}.have-code p{font-size:13px;color:#a2a59f;margin:0 0 12px}
 .fine{margin-top:48px;font-size:11px;line-height:1.9;color:#777b75;max-width:640px}
 @media(max-width:820px){.plans{grid-template-columns:1fr}}
+.pricing.narrow{max-width:760px}
+.acct-actions{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}.acct-actions .cta{width:auto;padding:10px 18px;background:transparent;color:inherit;cursor:pointer}
+.acct-actions[hidden],.acct-actions .cta[hidden]{display:none}

@@ -75,4 +75,4 @@ The results button downloads a Traditional Chinese Markdown (`.md`) brief, not a
 
 ## Access, plans and deployment (2026-10)
 
-Promo-code / monthly / project access now exists as a ticket layer (`access/`, `api/`, `/pricing`). Login and real payments are still **not** implemented. See `MONETIZATION.md` for the plan table and gaps, and `DEPLOYMENT.md` for Vercel setup and known risks. The sentence above saying there is "no payment, account or entitlement" still holds for login and payment; ticket-based entitlements are new.
+Promo-code / monthly / project access now exists as a ticket layer (`access/`, `api/`, `/pricing`). Email login and Stripe monthly checkout are implemented but untested against live services. See `MONETIZATION.md` for the plan table and gaps, and `DEPLOYMENT.md` for Vercel setup and known risks. The sentence above saying there is "no payment, account or entitlement" still holds for login and payment; ticket-based entitlements are new.

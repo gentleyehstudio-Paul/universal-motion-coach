@@ -1,23 +1,19 @@
-// Browser side of the access layer: keeps the ticket in localStorage and talks to /api.
-const KEY = 'ml_ticket';
-const read = () => { try { return localStorage.getItem(KEY) || ''; } catch { return ''; } };
-export const getTicket = read;
-export const setTicket = (t) => { try { t ? localStorage.setItem(KEY, t) : localStorage.removeItem(KEY); } catch {} };
-export const authHeaders = () => (read() ? { Authorization: `Bearer ${read()}` } : {});
-
+// Browser side of the access layer. The session lives in an HttpOnly cookie set by the
+// server; the page only ever sees {user, plan, remaining} from /api/status.
+const post = async (path, data = {}) => {
+  const r = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Motion-Lab': '1' }, body: JSON.stringify(data) });
+  const b = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(b.error || '服務暫時無法使用。');
+  return b;
+};
 export async function fetchStatus() {
-  const r = await fetch('/api/status', { headers: authHeaders() });
+  const r = await fetch('/api/status');
   if (!r.ok) throw new Error('status');
   return r.json();
 }
-// Accepts either a promo code (MOSTER-…) or a ticket pasted from the owner.
-export async function redeem(input) {
-  const v = String(input || '').trim();
-  if (!v) throw new Error('請輸入優惠碼或存取碼。');
-  if (v.includes('.')) { setTicket(v); return fetchStatus(); }
-  const r = await fetch('/api/redeem', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Motion-Lab': '1' }, body: JSON.stringify({ code: v }) });
-  const b = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error(b.error || '無法兌換。');
-  setTicket(b.ticket);
-  return fetchStatus();
-}
+export const requestLogin = (email) => post('/api/auth/request', { email });
+export const verifyLogin = (token) => post('/api/auth/verify', { token });
+export const logout = () => post('/api/auth/logout');
+export const redeem = (code) => post('/api/redeem', { code: String(code || '').trim() });
+export const startCheckout = () => post('/api/checkout').then((b) => { location.href = b.url; });
+export const openPortal = () => post('/api/portal').then((b) => { location.href = b.url; });
