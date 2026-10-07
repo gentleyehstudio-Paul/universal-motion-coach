@@ -35,8 +35,9 @@
     }
   ],
   "functions": {
-    "api/*.mjs": {
-      "maxDuration": 300
+    "api/**/*.mjs": {
+      "maxDuration": 300,
+      "includeFiles": "knowledge/**"
     }
   }
 }
