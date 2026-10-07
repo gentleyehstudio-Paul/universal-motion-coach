@@ -1,0 +1,13 @@
+.env
+.env.*
+!.env.example
+node_modules/
+.vercel/
+*.log
+.DS_Store
+!knowledge/
+!knowledge/*.md
+*.mov
+*.mp4
+*.m4v
+*.webm

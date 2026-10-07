@@ -1,0 +1,3 @@
+export const phaseNames=sport=>sport==='golf'?['準備','上桿頂點','擊球']:['準備','上升','出手'];
+export function validSequence(frames){return frames.length===3&&frames.every((f,i)=>f&&Number.isFinite(f.time)&&(!i||f.time>frames[i-1].time));}
+export function localEvidence(frames,view,sport){const lines=[];frames.forEach((f,i)=>{if(!f)return;const m=f.sample;lines.push(`${phaseNames(sport)[i]} ${f.time.toFixed(2)} s：${Number.isFinite(m?.lean)?`軀幹偏離垂直 ${m.lean.toFixed(1)}°（畫面投影）`:'關節資料不足，姿勢需確認'}。`);});lines.push(view==='side'?'側面可分別觀察軀幹角度與髖部位移；不能把位移直接解讀成前傾。':'非側面拍攝：前傾／朝籃框前移的方向需確認。');lines.push(sport==='basketball'?'人球一起上的連續時序需回看原片；三張靜態影格無法證實同步改善、力量或手腕 load。':'三张影格無法證實連續桿路、桿面角度或擊球效果。');return lines;}
