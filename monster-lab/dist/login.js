@@ -1,4 +1,4 @@
-import { requestLogin, verifyLogin, fetchStatus } from './access.mjs?v=2';
+import { requestLogin, verifyLogin, fetchStatus } from './access.mjs?v=3';
 
 const $ = (id) => document.getElementById(id);
 const next = (() => { const n = new URLSearchParams(location.search).get('next') || '/pricing'; return /^\/[a-z0-9/_-]*$/i.test(n) && !n.startsWith('//') ? n : '/pricing'; })();

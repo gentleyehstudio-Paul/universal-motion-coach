@@ -15,5 +15,5 @@ export const requestLogin = (email) => post('/api/auth/request', { email });
 export const verifyLogin = (token) => post('/api/auth/verify', { token });
 export const logout = () => post('/api/auth/logout');
 export const redeem = (code) => post('/api/redeem', { code: String(code || '').trim() });
-export const startCheckout = () => post('/api/checkout').then((b) => { location.href = b.url; });
+export const startCheckout = (plan) => post('/api/checkout', { plan }).then((b) => { location.href = b.url; });
 export const openPortal = () => post('/api/portal').then((b) => { location.href = b.url; });

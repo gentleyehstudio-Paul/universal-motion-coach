@@ -1,4 +1,4 @@
-import { fetchStatus, redeem, logout, startCheckout, openPortal } from './access.mjs?v=2';
+import { fetchStatus, redeem, logout, startCheckout, openPortal } from './access.mjs?v=3';
 
 // Fill once a booking/contact channel exists (LINE, form, ...). The project plan is booked, not checked out.
 const PROJECT_LINK = '';
@@ -18,17 +18,19 @@ function render() {
     : !a.user ? '尚未登入。登入後才能兌換優惠碼或訂閱。'
     : a.plan ? `${a.user}　·　${a.planLabel}，剩餘 ${a.remaining} 次分析。` : `${a.user}　·　尚無方案。`;
   $('redeemNote').textContent = enforced && !a.user ? '請先登入再兌換。' : '';
+  const sg = document.querySelector('[data-cta="single"]');
+  if (sg) { sg.textContent = a.user ? '購買 NT$129 / 次' : '登入後購買'; sg.setAttribute('aria-disabled', String(!enforced || !!a.error)); }
   const m = document.querySelector('[data-cta="monthly"]'), p = document.querySelector('[data-cta="project"]');
   if (m) { m.textContent = !a.user ? '登入後訂閱' : a.plan === 'monthly' ? '目前方案' : '訂閱 NT$399 / 月'; m.setAttribute('aria-disabled', String(!!status?.checkoutOff || a.plan === 'monthly')); }
   if (p) { if (PROJECT_LINK) { p.href = PROJECT_LINK; p.rel = 'noopener'; p.textContent = '預約洽談'; } else { p.textContent = '即將開放預約'; p.setAttribute('aria-disabled', 'true'); } }
 }
 async function refresh() { try { status = await fetchStatus(); } catch { status = null; } render(); }
 
-document.querySelector('[data-cta="monthly"]').addEventListener('click', async (e) => {
+for (const plan of ['single', 'monthly']) document.querySelector(`[data-cta="${plan}"]`).addEventListener('click', async (e) => {
   e.preventDefault();
   const a = status?.access || {};
   if (!a.user) { location.href = '/login?next=/pricing'; return; }
-  try { await startCheckout(); } catch (err) { $('accessState').textContent = err.message; }
+  try { await startCheckout(plan); } catch (err) { $('accessState').textContent = err.message; }
 });
 $('portalBtn').addEventListener('click', () => openPortal().catch((err) => { $('accessState').textContent = err.message; }));
 $('logoutBtn').addEventListener('click', async () => { await logout().catch(() => {}); refresh(); });

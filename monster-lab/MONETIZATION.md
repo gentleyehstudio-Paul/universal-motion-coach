@@ -3,7 +3,8 @@
 | Plan | Price (NT$) | Access | How it is granted today |
 |---|---|---|---|
 | 優惠碼體驗 | 0 | 1 AI analysis per code, ticket valid 14 days | self-serve: `/pricing` or workspace → enter code |
-| 月費方案 | 399 / month | 30 analyses / calendar month | owner issues a ticket (`scripts/issue.mjs`) |
+| 單次分析 | 129 | 1 AI analysis per purchase, valid 90 days, purchases stack | self-serve Stripe one-time Checkout |
+| 月費方案 | 399 / month | 30 analyses / calendar month | self-serve Stripe subscription |
 | 專案陪跑 | 1,500 / project | in-person setup + coaching (venue excluded) + 60 days of 30 analyses/month | owner issues a ticket after booking/payment |
 
 Limits and prices live only in `access/plans.mjs`.
@@ -19,12 +20,12 @@ Limits and prices live only in `access/plans.mjs`.
 ## Not built yet
 
 1. **Project plan payment** stays manual: book/invoice, then `scripts/issue.mjs grant <email> project`. Fill `PROJECT_LINK` in `dist/pricing.js` with your booking channel.
-2. **Refunds/disputes** are not wired to the webhook; revoke manually with `scripts/issue.mjs revoke <grant-id>`.
+2. **Refunds**: a full refund of a single analysis revokes that purchase automatically (`charge.refunded`). Monthly refunds, partial refunds and disputes are not handled; revoke manually with `scripts/issue.mjs revoke <grant-id>`.
 3. **Taiwan local payment methods** (ECPay/NewebPay, convenience-store, ATM) — Stripe covers cards; add later if customers ask.
 4. **Terms/privacy pages**, and a receipt/invoice policy (統一發票) before public launch.
 5. Domain: set `SITE_ORIGIN`, then verify the domain in Resend.
 
 ## Suggestions
 
-- Add a **pay-per-use single analysis** (NT$99–149) as a Stripe one-time price — the webhook shape already supports a one-time grant.
+- NT$129 for a single analysis is my placeholder: change `priceTWD` in `access/plans.mjs` and the Stripe price together. Sanity-check it against real OpenAI cost per review and keep it clearly above the per-analysis cost of the monthly plan (NT$399 / 30 ≈ NT$13).
 - Check real OpenAI cost per review on Preview, then confirm the NT$399 margin at 30 analyses/month.

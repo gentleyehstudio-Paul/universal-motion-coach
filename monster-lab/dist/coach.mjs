@@ -1,7 +1,7 @@
 import {phaseNames,localEvidence} from './coach-core.mjs';
 import {fitRect} from './graphic.mjs?v=frame-6';
 import {visible} from './metrics.mjs';
-import {redeem,fetchStatus} from './access.mjs?v=2';
+import {redeem,fetchStatus} from './access.mjs?v=3';
 export function createCoach({getState,video,seek,onLock,onReview}){
  const $=id=>document.getElementById(id),canvas=$('coachCanvas'),ctx=canvas.getContext('2d'),view=$('coachView');let frames=[null,null,null],generated=[null,null,null],align=[{x:0,y:0,scale:100},{x:0,y:0,scale:100},{x:0,y:0,scale:100}],review=null,job=null,working=false,configured=false,revision=0,exportURL=null;
  const message=t=>$('coachMessage').textContent=t;

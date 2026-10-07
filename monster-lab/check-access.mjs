@@ -148,6 +148,31 @@ assert.equal(verifySession(S, t, T0), null, 'a ticket is not a session');
 assert.ok(verifyWebhook(WH, '{"a":1}', sign('{"a":1}', T0), T0));
 assert.equal(verifyWebhook(WH, '{"a":2}', sign('{"a":1}', T0), T0), null, 'body tamper');
 
+// Single paid analysis (one-time Stripe payment)
+{
+  const { h, cookieFor, stripeCalls, now, calls } = make({ env: { STRIPE_PRICE_SINGLE: 'price_single' } });
+  const me = cookieFor('a@b.co');
+  const c = await h.checkout({ headers: me, body: { plan: 'single' } });
+  assert.equal(c.status, 200);
+  assert.match(stripeCalls[0].body, /mode=payment/); assert.match(stripeCalls[0].body, /price_single/);
+  assert.equal((await make().h.checkout({ headers: make().cookieFor('a@b.co'), body: { plan: 'single' } })).status, 503, 'price not configured');
+  const post = (event) => { const raw = JSON.stringify(event); return h.stripeWebhook({ headers: { 'stripe-signature': sign(raw, now()) }, rawBody: raw }); };
+  const pay = (id, status = 'paid', type = 'checkout.session.completed') => ({ id: `ev_${id}_${status}_${type}`, type, data: { object: { id: 'cs_' + id, mode: 'payment', payment_status: status, payment_intent: 'pi_' + id, client_reference_id: 'a@b.co' } } });
+  assert.equal((await post(pay('1', 'unpaid'))).body.pending, true);
+  assert.equal((await h.review({ headers: me, body: reviewBody })).status, 402, 'unpaid grants nothing');
+  assert.equal((await post(pay('1'))).status, 200);
+  assert.equal((await post(pay('2'))).status, 200);
+  const st = (await h.status({ headers: me })).body.access;
+  assert.equal(st.plan, 'single'); assert.equal(st.remaining, 2, 'purchases stack');
+  assert.equal((await h.review({ headers: me, body: reviewBody })).status, 200);
+  assert.equal((await h.status({ headers: me })).body.access.remaining, 1);
+  assert.equal((await post(pay('3', 'paid', 'checkout.session.async_payment_succeeded'))).status, 200);
+  assert.equal((await h.status({ headers: me })).body.access.remaining, 2);
+  // refund revokes that purchase only
+  assert.equal((await post({ id: 'ev_r', type: 'charge.refunded', data: { object: { payment_intent: 'pi_2' } } })).status, 200);
+  assert.equal((await h.status({ headers: me })).body.access.remaining, 1);
+  assert.equal(calls.n, 1);
+}
 // fail closed; open mode for local owner use
 {
   const h = createHandlers({ env: { OPENAI_API_KEY: 'k' }, store: memoryStore(), mode: 'enforced', mail: { configured: false }, callModel: goodModel });

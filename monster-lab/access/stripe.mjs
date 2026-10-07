@@ -10,8 +10,9 @@ async function stripe(env, path, params, fetchImpl = fetch) {
   if (!r.ok) throw Object.assign(new Error('付款服務暫時無法使用，請稍後再試。'), { expose: true });
   return j;
 }
-export const createCheckout = (env, { email, origin }, f) => stripe(env, 'checkout/sessions', {
-  mode: 'subscription', 'line_items[0][price]': env.STRIPE_PRICE_MONTHLY, 'line_items[0][quantity]': 1,
+export const createCheckout = (env, { email, origin, plan }, f) => stripe(env, 'checkout/sessions', {
+  mode: plan === 'monthly' ? 'subscription' : 'payment',
+  'line_items[0][price]': plan === 'monthly' ? env.STRIPE_PRICE_MONTHLY : env.STRIPE_PRICE_SINGLE, 'line_items[0][quantity]': 1,
   customer_email: email, client_reference_id: email, success_url: `${origin}/pricing?paid=1`, cancel_url: `${origin}/pricing`,
   allow_promotion_codes: 'true',
 }, f);

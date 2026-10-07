@@ -15,7 +15,7 @@
   - `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` — add Upstash Redis from the Vercel Marketplace (it sets these, or the `KV_REST_API_*` names, for you). **Required**: without a persistent store the API returns 503 instead of granting access.
   - `SITE_ORIGIN` — e.g. `https://your-domain.com`. **Required for login**: login links in emails are built from it (never from the request Host header). Without a custom domain yet, Vercel's `VERCEL_URL` is used as a fallback.
   - `RESEND_API_KEY`, `MAIL_FROM` — sign-in emails via [Resend](https://resend.com) (`MAIL_FROM` like `Moster Lab <login@your-domain.com>`, on a domain verified in Resend; Resend's test sender only mails your own address).
-  - Stripe (monthly plan): `STRIPE_SECRET_KEY`, `STRIPE_PRICE_MONTHLY` (a recurring TWD price, NT$399/month, created in the Stripe dashboard), `STRIPE_WEBHOOK_SECRET`.
+  - Stripe (monthly plan): `STRIPE_SECRET_KEY`, `STRIPE_PRICE_MONTHLY` (recurring TWD price, NT$399/month), `STRIPE_PRICE_SINGLE` (one-time TWD price, NT$129), `STRIPE_WEBHOOK_SECRET`. Create both prices in the Stripe dashboard; the amounts shown on `/pricing` come from `access/plans.mjs`, so keep them equal.
   - optional: `OPENAI_VISION_MODEL`.
 
 ## Known deployment risks (check on the first Preview)
@@ -27,7 +27,7 @@
 ## Stripe setup
 
 1. Dashboard → Product catalogue → create "Moster Lab 月費" with a recurring monthly price of NT$399 → copy its `price_...` id into `STRIPE_PRICE_MONTHLY`.
-2. Developers → Webhooks → add endpoint `https://<your-domain>/api/stripe/webhook` with events `checkout.session.completed`, `invoice.paid`, `customer.subscription.deleted` → copy the signing secret into `STRIPE_WEBHOOK_SECRET`.
+2. Developers → Webhooks → add endpoint `https://<your-domain>/api/stripe/webhook` with events `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `invoice.paid`, `customer.subscription.deleted`, `charge.refunded` → copy the signing secret into `STRIPE_WEBHOOK_SECRET`.
 3. Settings → Billing → Customer portal → enable (lets subscribers cancel/update cards from 「管理訂閱」).
 4. Test with Stripe test keys and card `4242 4242 4242 4242` on a Preview deployment before switching to live keys. The webhook reads the raw request body to check Stripe's signature; confirm on the first Preview that Stripe's test event returns 200 (if it returns 400, Vercel parsed the body first and the raw-body read needs adjusting).
 

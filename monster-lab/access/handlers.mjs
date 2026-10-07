@@ -35,6 +35,8 @@ export function createHandlers(ctx) {
     const rank = (s) => (s.remaining > 0 ? 0 : 2) + (s.plan.period === 'month' ? 0 : 1);
     return states.sort((a, b) => rank(a) - rank(b) || b.grant.exp - a.grant.exp)[0] ?? null;
   }
+  // One-time grants (promo, single) stack: show the total credits left, not just the first grant's.
+  const oneTimeCredits = async (email) => (await Promise.all((await getGrants(store, email)).map(grantState))).filter((x) => x && x.plan.period !== 'month').reduce((n, x) => n + x.remaining, 0);
   const hasActiveSubscription = async (email) => (await Promise.all((await getGrants(store, email)).filter((g) => g.id.startsWith('sub_')).map(grantState))).some(Boolean);
 
   async function rateLimit(key, limit, ttl) { return (await store.incr(key, 1, ttl)) <= limit; }
@@ -51,7 +53,7 @@ export function createHandlers(ctx) {
         access.valid = false;
         if (email) {
           const s = await bestGrant(email).catch(() => null);
-          if (s) Object.assign(access, { valid: s.remaining > 0, plan: s.plan.id, planLabel: s.plan.label, remaining: s.remaining, expiresAt: s.grant.exp, canManageBilling: !!(await store.get(`cust:${email}`)) });
+          if (s) Object.assign(access, { valid: s.remaining > 0, plan: s.plan.id, planLabel: s.plan.label, remaining: s.plan.period === 'month' ? s.remaining : await oneTimeCredits(email), expiresAt: s.grant.exp, canManageBilling: !!(await store.get(`cust:${email}`)) });
         }
       }
       return { status: 200, body: { configured: !!env.OPENAI_API_KEY, provider: 'OpenAI', access } };
@@ -142,14 +144,16 @@ export function createHandlers(ctx) {
     },
 
     // --- Stripe: monthly subscription ---
-    async checkout({ headers }) {
+    async checkout({ headers, body }) {
       const bad = misconfigured();
       if (bad) return fail(503, bad);
-      if (!env.STRIPE_SECRET_KEY || !env.STRIPE_PRICE_MONTHLY) return fail(503, '線上付款尚未開通。');
+      const plan = body?.plan === 'single' ? 'single' : 'monthly';
+      const price = plan === 'single' ? env.STRIPE_PRICE_SINGLE : env.STRIPE_PRICE_MONTHLY;
+      if (!env.STRIPE_SECRET_KEY || !price) return fail(503, '線上付款尚未開通。');
       const email = userOf(headers);
-      if (!email) return fail(401, '請先登入再訂閱。');
-      if (await hasActiveSubscription(email)) return fail(409, '你已有進行中的月費方案；可在「管理訂閱」調整。');
-      const s = await createCheckout(env, { email, origin: origin() }, ctx.fetch);
+      if (!email) return fail(401, '請先登入再購買。');
+      if (plan === 'monthly' && await hasActiveSubscription(email)) return fail(409, '你已有進行中的月費方案；可在「管理訂閱」調整。');
+      const s = await createCheckout(env, { email, origin: origin(), plan }, ctx.fetch);
       return { status: 200, body: { url: s.url } };
     },
     async portal({ headers }) {
@@ -172,6 +176,17 @@ export function createHandlers(ctx) {
         await store.set(`cust:${email}`, o.customer);
         await store.set(`custemail:${o.customer}`, email);
         await upsertGrant(store, email, { id: `sub_${o.subscription}`, plan: 'monthly', exp: now() + 35 * DAY }, now());
+      } else if ((event.type === 'checkout.session.completed' || event.type === 'checkout.session.async_payment_succeeded') && o.mode === 'payment') {
+        // Single analysis. Paid immediately for cards; delayed methods complete later (async_payment_succeeded).
+        if (o.payment_status !== 'paid') { await store.set(`evt:${event.id}`, '1', 7 * 86400); return { status: 200, body: { received: true, pending: true } }; }
+        const email = normalizeEmail(o.client_reference_id);
+        if (!email) return fail(400, 'no account reference');
+        const id = `pay_${o.id}`;
+        await upsertGrant(store, email, { id, plan: 'single', exp: now() + PLANS.single.ticketDays * DAY }, now());
+        if (o.payment_intent) await store.set(`pi:${o.payment_intent}`, id);
+      } else if (event.type === 'charge.refunded' && o.payment_intent) {
+        const id = await store.get(`pi:${o.payment_intent}`);
+        if (id) await store.set(`revoked:${id}`, '1');
       } else if (event.type === 'invoice.paid') {
         const sub = o.subscription || o.parent?.subscription_details?.subscription;
         const end = o.lines?.data?.[0]?.period?.end;
