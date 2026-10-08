@@ -1,7 +1,7 @@
 import {phaseNames,localEvidence} from './coach-core.mjs';
 import {fitRect} from './graphic.mjs?v=frame-6';
 import {visible} from './metrics.mjs';
-import {redeem,fetchStatus} from './access.mjs?v=3';
+import {redeem,fetchStatus,requestLogin,logout} from './access.mjs?v=4';
 export function createCoach({getState,video,seek,onLock,onReview}){
  const $=id=>document.getElementById(id),canvas=$('coachCanvas'),ctx=canvas.getContext('2d'),view=$('coachView');let frames=[null,null,null],generated=[null,null,null],align=[{x:0,y:0,scale:100},{x:0,y:0,scale:100},{x:0,y:0,scale:100}],review=null,job=null,working=false,configured=false,revision=0,exportURL=null;
  const message=t=>$('coachMessage').textContent=t;
@@ -64,15 +64,22 @@ export function createCoach({getState,video,seek,onLock,onReview}){
  if(all){out.width=2560;out.height=4320;const oc=out.getContext('2d');for(let i=0;i<3;i++){const part=document.createElement('canvas');part.width=2560;part.height=1440;drawTo(part,i,'pair');oc.drawImage(part,0,i*1440);}}
  out.toBlob(blob=>{if(!blob){message('無法匯出圖片。');return;}if(exportURL)URL.revokeObjectURL(exportURL);exportURL=URL.createObjectURL(blob);const a=$('coachDownload');a.href=exportURL;a.download=all?'motion-lab-three-phases.png':'motion-lab-ai-comparison.png';a.hidden=false;$('coachExportImage').src=exportURL;$('coachExportPreview').hidden=false;a.click();message(`已產生 ${out.width} × ${out.height} PNG；若未下載請點「儲存分析圖」。`);},'image/png');}
  $('coachSave').onclick=()=>save(false);$('coachSaveAll').onclick=()=>save(true);async function saveSuggestion(){const phase=Number($('coachPhase').value),img=generated[phase];if(!img){message('此階段尚未生成建議姿勢示意圖。');return;}const out=document.createElement('canvas');out.width=img.naturalWidth||img.width;out.height=img.naturalHeight||img.height;out.getContext('2d').drawImage(img,0,0,out.width,out.height);out.toBlob(blob=>{if(!blob){message('無法匯出建議姿勢 PNG，請重試。');return;}if(exportURL)URL.revokeObjectURL(exportURL);exportURL=URL.createObjectURL(blob);const a=$('coachDownload');a.href=exportURL;a.download=`motion-lab-${getState().sport}-phase-${phase+1}-suggested-pose.png`;a.hidden=false;$('coachExportImage').src=exportURL;$('coachExportPreview').hidden=false;a.click();message(`建議姿勢示意已整理為 ${out.width} × ${out.height} PNG。若未自動下載，請點「儲存 PNG」或展開預覽後長按圖片儲存。`);},'image/png');}$('coachSaveSuggestion').onclick=saveSuggestion;
- let currentUser=null;function applyStatus(s){const a=s.access||{};currentUser=a.user||null;const enforced=a.mode==='enforced',ok=!enforced||a.valid;configured=!!s.configured&&ok;$('coachAccess').hidden=!enforced;const el=$('coachConnection');
+ let currentUser=null;
+ function showAccess(a){const out=!a.user,none=!!a.user&&!a.valid,ready=!!a.user&&!!a.valid;$('accessOut').hidden=!out;$('accessNone').hidden=!none;$('accessReady').hidden=!ready;
+  $('stepLogin').className=out?'on':'done';$('stepCredit').className=out?'':none?'on':'done';$('stepGo').className=ready?'on':'';
+  $('accessUser1').textContent=$('accessUser2').textContent=a.user||'';
+  $('accessPlan').textContent=a.plan?`${a.planLabel}，剩餘 ${a.remaining} 次分析（已綁定帳號，不用再輸入優惠碼）`:'';}
+ function applyStatus(s){const a=s.access||{};currentUser=a.user||null;const enforced=a.mode==='enforced',ok=!enforced||a.valid;configured=!!s.configured&&ok;$('coachAccess').hidden=!enforced||!!a.error;if(enforced&&!a.error)showAccess(a);const el=$('coachConnection');
   if(a.error)el.textContent=a.error;
   else if(!s.configured)el.textContent=enforced?'AI 分析暫時無法使用（伺服器尚未啟用）。影片回放與骨架分析仍可本機使用。':'AI 建議尚未啟用：伺服器沒有 API 金鑰。請關閉舊的服務終端，再執行「啟用AI.command」並於終端提示輸入金鑰。影片回放與骨架分析仍可本機使用。';
-  else if(enforced&&!a.user)el.textContent='AI 分析需要先用 Email 登入。影片回放與骨架分析仍可免費使用。';
-  else if(!ok)el.textContent=a.plan?`「${a.planLabel}」的分析次數已用完。`:'AI 分析需要優惠碼或訂閱：輸入優惠碼可免費分析 1 次。影片回放與骨架分析仍可免費使用。';
-  else if(enforced)el.textContent=`已啟用「${a.planLabel}」，剩餘 ${a.remaining} 次分析。OpenAI 服務僅在你同意後傳送畫面。`;
+  else if(enforced&&!a.user)el.textContent='影片回放與骨架分析免費使用。要用 AI 分析，請先在下方登入。';
+  else if(!ok)el.textContent=a.plan?`「${a.planLabel}」的分析次數已用完，可再兌換優惠碼或購買。`:'已登入，但還沒有分析次數：輸入優惠碼可免費分析 1 次。';
+  else if(enforced)el.textContent='可以開始了：你的優惠碼／方案已綁定在帳號上，不用再輸入。勾選下方同意後按「檢視」即可。';
   else el.textContent='OpenAI 服務已連線，僅在你同意後傳送畫面。';sync();}
  function refreshStatus(){return fetchStatus().then(applyStatus).catch(()=>{$('coachConnection').textContent='目前為靜態預覽，AI 服務未啟動。請使用專案的本機伺服器。';});}
- $('coachRedeemBtn').onclick=async()=>{const input=$('coachRedeemInput'),note=$('coachRedeemNote');if(!currentUser){location.href='/login?next=/app/';return;}try{note.textContent='驗證中…';await redeem(input.value);input.value='';note.textContent='已啟用。';await refreshStatus();}catch(e){note.textContent=e.message;}};
+ $('accessSend').onclick=async()=>{const note=$('accessNote'),btn=$('accessSend'),email=$('accessEmail').value.trim();if(!email){note.textContent='請輸入 Email。';return;}btn.disabled=true;note.textContent='寄送中…';try{await requestLogin(email,$('accessCode').value,'/app/');note.textContent=`已寄到 ${email}。到信箱點連結登入後，會自動回到這裡${$('accessCode').value.trim()?'並兌換優惠碼':''}。`;}catch(e){note.textContent=e.message;}finally{btn.disabled=false;}};
+ $('coachRedeemBtn').onclick=async()=>{const input=$('coachRedeemInput'),note=$('coachRedeemNote');try{note.textContent='驗證中…';await redeem(input.value);input.value='';note.textContent='';await refreshStatus();}catch(e){note.textContent=e.message;}};
+ $('accessLogout').onclick=async()=>{await logout().catch(()=>{});await refreshStatus();};
  refreshStatus();
  document.fonts.ready.then(draw);render();return {reset,sync,render,getReview:()=>review?structuredClone(review):null,invalidate:()=>{invalidate();render();}};
 }

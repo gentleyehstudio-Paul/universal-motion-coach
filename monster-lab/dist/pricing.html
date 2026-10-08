@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/landing.css?v=launch-8">
-  <link rel="stylesheet" href="/pricing.css?v=3">
+  <link rel="stylesheet" href="/pricing.css?v=4">
 </head>
 <body>
   <header class="site-header">
@@ -35,9 +35,11 @@
         <p class="price"><b>NT$0</b></p>
         <ul><li>輸入優惠碼，免費 1 次 AI 影片分析</li><li>每組優惠碼只能分析一次</li><li>用 Email 登入即可，不用密碼</li></ul>
         <form id="redeemForm" class="redeem" autocomplete="off">
+          <div id="redeemEmailWrap"><label for="redeemEmail">Email（用來登入）</label><input id="redeemEmail" class="field" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com"></div>
           <label for="redeemInput">優惠碼</label>
-          <div class="row"><input id="redeemInput" placeholder="MOSTER-XXXXXXXX-XXXX" spellcheck="false"><button type="submit">兌換</button></div>
-          <small id="redeemNote" role="status">需先登入。</small>
+          <input id="redeemInput" class="field" placeholder="MOSTER-XXXXXXXX-XXXX" spellcheck="false">
+          <button class="primary" id="redeemBtn" type="submit">寄登入連結並兌換</button>
+          <small id="redeemNote" role="status"></small>
         </form>
       </article>
 
@@ -69,14 +71,15 @@
     <section class="have-code" aria-label="我的帳號">
       <h2>我的帳號</h2>
       <p id="accessState">載入中…</p>
+      <p><a id="goApp" class="text-link" href="/app/" hidden>前往上傳影片 <span>↗</span></a></p>
       <div class="acct-actions"><a id="loginLink" class="cta" href="/login?next=/pricing" hidden>用 Email 登入</a><button id="portalBtn" class="cta" type="button" hidden>管理訂閱</button><button id="logoutBtn" class="cta" type="button" hidden>登出</button></div>
-      <form id="ticketForm" class="redeem" autocomplete="off" hidden><label for="ticketInput">已有存取碼？</label><div class="row"><input id="ticketInput" placeholder="貼上你收到的存取碼" spellcheck="false"><button type="submit">啟用</button></div><small id="ticketNote" role="status"></small></form>
+      
     </section>
 
     <p class="fine">AI 分析為依影片取樣畫面的觀察建議，不是醫療或傷害診斷。分析時才會把你同意送出的縮小畫面傳給 OpenAI；整段影片與音訊不會上傳。</p>
   </main>
   <footer><a class="wordmark" href="/"><span class="mark">M</span><span>MOSTER <span class="wordmark-light">LAB</span></span></a><span>ANALYZE · IMPROVE · LIVE BETTER</span><span>© MOSTER LAB</span></footer>
-  <script type="module" src="/pricing.js?v=3"></script>
+  <script type="module" src="/pricing.js?v=4"></script>
   <script src="/landing.js?v=launch-3" defer></script>
 </body>
 </html>

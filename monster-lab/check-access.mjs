@@ -37,6 +37,16 @@ const code = makePromoCode(S);
 assert.ok(parsePromoCode(S, code));
 assert.equal(parsePromoCode('other', code), null);
 
+// SITE_ORIGIN typed by hand
+import { normalizeOrigin, allowedOrigins } from './access/origin.mjs';
+assert.equal(normalizeOrigin('mosterlab.com'), 'https://mosterlab.com');
+assert.equal(normalizeOrigin(' https://MosterLab.com/ '), 'https://mosterlab.com');
+assert.equal(normalizeOrigin('https://mosterlab.com/login'), 'https://mosterlab.com');
+assert.equal(normalizeOrigin(''), '');
+assert.deepEqual(allowedOrigins('mosterlab.com'), ['https://mosterlab.com', 'https://www.mosterlab.com']);
+assert.deepEqual(allowedOrigins('https://www.mosterlab.com/'), ['https://www.mosterlab.com', 'https://mosterlab.com']);
+{ const { h, sent } = make({ env: { SITE_ORIGIN: 'mosterlab.com/' } }); await h.authRequest({ headers: {}, body: { email: 'a@b.co' } }); assert.match(sent[0].text, /https:\/\/mosterlab\.com\/login#token=/); }
+
 // sessions
 assert.equal(normalizeEmail(' A@B.co '), 'a@b.co');
 assert.equal(normalizeEmail('not-an-email'), null);
@@ -75,6 +85,23 @@ assert.equal(verifySession(S, t, T0), null, 'a ticket is not a session');
   assert.equal(r.status, 503); assert.equal(r.body.devLink, undefined);
 }
 
+// one-step flow: email + promo code together, redeemed automatically on login
+{
+  const { h, sent } = make();
+  assert.equal((await h.authRequest({ headers: {}, body: { email: 'a@b.co', code: 'MOSTER-AAAAAAAA-AAAA' } })).status, 400, 'bad code is rejected before any email is sent');
+  assert.equal(sent.length, 0);
+  assert.equal((await h.authRequest({ headers: {}, body: { email: 'a@b.co', code, next: '/app/' } })).status, 200);
+  const tok = /token=(\S+)/.exec(sent[0].text)[1];
+  const v = await h.authVerify({ body: { token: tok } });
+  assert.equal(v.body.redeemed.remaining, 1); assert.equal(v.body.next, '/app/');
+  const me = { cookie: v.cookies[0].split(';')[0] };
+  assert.equal((await h.status({ headers: me })).body.access.remaining, 1, 'credit is there without a second code entry');
+  assert.equal((await h.review({ headers: me, body: reviewBody })).status, 200);
+  // open-redirect guard: only known in-site destinations are kept
+  await h.authRequest({ headers: {}, body: { email: 'x@y.co', next: 'https://evil.example' } });
+  const t2 = /token=(\S+)/.exec(sent[1].text)[1];
+  assert.equal((await h.authVerify({ body: { token: t2 } })).body.next, '');
+}
 // promo → account → exactly one analysis
 {
   const { h, calls, cookieFor } = make();

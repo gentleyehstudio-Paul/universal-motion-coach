@@ -9,7 +9,7 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2714%27 fill=%27%23080908%27 stroke=%27%239c9f99%27/%3E%3Ctext x=%2716%27 y=%2721%27 text-anchor=%27middle%27 font-size=%2714%27 fill=%27%23f1f1ec%27 font-family=%27Arial%27%3EM%3C/text%3E%3C/svg%3E">
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/landing.css?v=launch-8">
-  <link rel="stylesheet" href="/pricing.css?v=3">
+  <link rel="stylesheet" href="/pricing.css?v=4">
 </head>
 <body>
   <header class="site-header">
@@ -20,15 +20,20 @@
   <main class="pricing narrow">
     <div class="micro-label"><span>SIGN IN</span><span>EMAIL</span></div>
     <h1>用 Email 登入。<br><span>不用記密碼。</span></h1>
-    <p class="lead" id="loginLead">輸入 Email，我們會寄一個一次性登入連結給你。</p>
+    <ol class="flow" aria-label="流程"><li class="on" id="flow1">輸入 Email<small>有優惠碼一起填</small></li><li id="flow2">到信箱點連結</li><li id="flow3">開始上傳影片</li></ol>
+    <p class="lead" id="loginLead">我們會寄一個一次性登入連結給你。</p>
     <form id="loginForm" class="redeem" autocomplete="on">
       <label for="loginEmail">Email</label>
-      <div class="row"><input id="loginEmail" type="email" inputmode="email" autocomplete="email" required placeholder="you@example.com"><button type="submit">寄登入連結</button></div>
+      <input id="loginEmail" class="field" type="email" inputmode="email" autocomplete="email" required placeholder="you@example.com">
+      <label for="loginCode">優惠碼（選填）</label>
+      <input id="loginCode" class="field" autocomplete="off" spellcheck="false" placeholder="MOSTER-XXXXXXXX-XXXX">
+      <button type="submit" class="primary" id="loginBtn">寄登入連結</button>
       <small id="loginNote" role="status"></small>
     </form>
-    <p class="fine">登入連結 15 分鐘內有效、只能使用一次。按下連結後會在這個瀏覽器保持登入 30 天。</p>
+    <div id="sentBox" hidden><p class="lead" id="sentText"></p><button type="button" class="cta" id="resendBtn">改用其他 Email／重新寄送</button></div>
+    <p class="fine">登入連結 15 分鐘內有效、只能使用一次。有優惠碼的話，點連結登入後會自動兌換，不用再輸入第二次。</p>
   </main>
-  <script type="module" src="/login.js?v=1"></script>
+  <script type="module" src="/login.js?v=2"></script>
   <script src="/landing.js?v=launch-3" defer></script>
 </body>
 </html>

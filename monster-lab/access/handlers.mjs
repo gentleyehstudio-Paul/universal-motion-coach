@@ -3,6 +3,7 @@ import { verifyTicket, parsePromoCode } from './tickets.mjs';
 import { normalizeEmail, sha, newLoginToken, signSession, verifySession, readCookie, sessionCookie, SESSION_COOKIE } from './session.mjs';
 import { getGrants, upsertGrant } from './accounts.mjs';
 import { loginMail } from './mail.mjs';
+import { normalizeOrigin } from './origin.mjs';
 import { createCheckout, createPortal, verifyWebhook } from './stripe.mjs';
 import { validateFrames, validateReview } from '../ai-policy.mjs';
 
@@ -18,7 +19,7 @@ export function createHandlers(ctx) {
   const env = ctx.env, secret = env.ACCESS_SECRET, enforced = ctx.mode === 'enforced';
   const store = ctx.store;
   // Trusted origin only (never the Host header): it ends up inside emailed login links.
-  const origin = () => (env.SITE_ORIGIN || (env.VERCEL_URL ? `https://${env.VERCEL_URL}` : '')).replace(/\/$/, '');
+  const origin = () => normalizeOrigin(env.SITE_ORIGIN) || (env.VERCEL_URL ? normalizeOrigin(env.VERCEL_URL) : '');
   const secure = () => origin().startsWith('https://');
   const misconfigured = () => enforced && (!secret || !store.persistent) ? '權限服務尚未設定完成（ACCESS_SECRET／資料庫）。' : null;
   const userOf = (headers) => verifySession(secret, readCookie(headers.cookie, SESSION_COOKIE), now())?.sub ?? null;
@@ -38,6 +39,25 @@ export function createHandlers(ctx) {
   // One-time grants (promo, single) stack: show the total credits left, not just the first grant's.
   const oneTimeCredits = async (email) => (await Promise.all((await getGrants(store, email)).map(grantState))).filter((x) => x && x.plan.period !== 'month').reduce((n, x) => n + x.remaining, 0);
   const hasActiveSubscription = async (email) => (await Promise.all((await getGrants(store, email)).filter((g) => g.id.startsWith('sub_')).map(grantState))).some(Boolean);
+
+  // A promo code or an owner-issued ticket -> the grant it stands for (null if invalid/revoked).
+  async function resolveCode(input) {
+    const v = String(input ?? '').trim();
+    let grant = null;
+    if (v.includes('.')) {
+      const t = verifyTicket(secret, v, now());
+      if (t) grant = { id: t.id, plan: t.plan, exp: t.exp * 1000 };
+    } else {
+      const p = parsePromoCode(secret, v);
+      if (p) grant = { id: p.ticketId, plan: 'trial', exp: now() + PLANS.trial.ticketDays * DAY };
+    }
+    return grant && !(await store.get(`revoked:${grant.id}`)) ? grant : null;
+  }
+  async function claim(email, grant) {
+    await upsertGrant(store, email, grant, now());
+    const s = await bestGrant(email);
+    return { plan: grant.plan, planLabel: PLANS[grant.plan].label, remaining: s?.remaining ?? 0 };
+  }
 
   async function rateLimit(key, limit, ttl) { return (await store.incr(key, 1, ttl)) <= limit; }
 
@@ -67,8 +87,16 @@ export function createHandlers(ctx) {
       if (!email) return fail(400, '請輸入有效的 Email。');
       if (!origin() && !ctx.devLogin) return fail(503, '網站網址（SITE_ORIGIN）尚未設定。');
       if (!(await rateLimit(`rl:email:${sha(email)}`, 5, 3600)) || !(await rateLimit(`rl:ip:${sha(clientIp(headers))}`, 30, 3600))) return fail(429, '要求次數過多，請一小時後再試。');
+      // Optional promo code typed together with the email: check it now (fail fast, before the
+      // person waits for an email) and redeem it automatically when the link is opened.
+      let code = '';
+      if (String(body?.code ?? '').trim()) {
+        if (!(await resolveCode(body.code))) return fail(400, '優惠碼無效，請確認是否輸入完整。');
+        code = String(body.code).trim();
+      }
       const token = newLoginToken();
-      await store.set(`login:${sha(token)}`, email, 900);
+      const next = ['/app/', '/pricing'].includes(body?.next) ? body.next : '';
+      await store.set(`login:${sha(token)}`, JSON.stringify({ email, code, next }), 900);
       const link = `${origin() || ctx.devLogin}/login#token=${token}`;
       const generic = { sent: true };
       if (ctx.mail.configured) await ctx.mail.send({ to: email, ...loginMail(link) });
@@ -80,9 +108,15 @@ export function createHandlers(ctx) {
       const bad = misconfigured();
       if (bad) return fail(503, bad);
       const token = typeof body?.token === 'string' ? body.token.slice(0, 100) : '';
-      const email = token ? await store.take(`login:${sha(token)}`) : null;
-      if (!email) return fail(400, '登入連結無效或已過期，請重新取得。');
-      return { status: 200, body: { email }, cookies: [sessionCookie(signSession(secret, email, now()), { secure: secure() })] };
+      const raw = token ? await store.take(`login:${sha(token)}`) : null;
+      if (!raw) return fail(400, '登入連結無效或已過期，請重新取得。');
+      let rec; try { rec = JSON.parse(raw); } catch { rec = { email: raw }; }
+      const out = { email: rec.email, next: rec.next || '' };
+      if (rec.code) {
+        const grant = await resolveCode(rec.code);
+        if (grant) out.redeemed = await claim(rec.email, grant); else out.redeemError = '優惠碼已失效，請到方案頁重新輸入。';
+      }
+      return { status: 200, body: out, cookies: [sessionCookie(signSession(secret, rec.email, now()), { secure: secure() })] };
     },
     async logout() { return { status: 200, body: { ok: true }, cookies: [sessionCookie('', { secure: secure() })] }; },
 
@@ -92,20 +126,9 @@ export function createHandlers(ctx) {
       if (bad) return fail(503, bad);
       const email = userOf(headers);
       if (!email) return fail(401, '請先登入再兌換。');
-      const input = String(body?.code ?? '').trim();
-      let grant = null;
-      if (input.includes('.')) {
-        const t = verifyTicket(secret, input, now());
-        if (t) grant = { id: t.id, plan: t.plan, exp: t.exp * 1000 };
-      } else {
-        const p = parsePromoCode(secret, input);
-        if (p) grant = { id: p.ticketId, plan: 'trial', exp: now() + PLANS.trial.ticketDays * DAY };
-      }
+      const grant = await resolveCode(body?.code);
       if (!grant) return fail(400, '代碼無效，請確認是否輸入完整。');
-      if (await store.get(`revoked:${grant.id}`)) return fail(400, '此代碼已停用。');
-      await upsertGrant(store, email, grant, now());
-      const s = await bestGrant(email);
-      return { status: 200, body: { plan: grant.plan, planLabel: PLANS[grant.plan].label, remaining: s?.remaining ?? 0 } };
+      return { status: 200, body: await claim(email, grant) };
     },
 
     // --- paid analysis ---
