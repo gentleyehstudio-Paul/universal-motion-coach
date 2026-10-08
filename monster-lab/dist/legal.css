@@ -1,0 +1,12 @@
+.legal h2{font:600 18px Manrope,'Noto Sans TC',sans-serif;margin:34px 0 10px;color:#f1f1ec}
+.legal p,.legal li{font-size:14px;line-height:1.9;color:#b4b7b1}
+.legal ul{padding-left:20px;margin:8px 0}.legal li{margin:4px 0}
+.legal a{color:#f1f1ec;text-decoration:underline;text-underline-offset:3px}
+.legal strong{color:#f1f1ec;font-weight:600}
+.legal .lead{max-width:none}
+.legal-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}
+.legal-table th,.legal-table td{border:1px solid #363936;padding:10px 12px;text-align:left;vertical-align:top;line-height:1.7;color:#b4b7b1}
+.legal-table th{background:#0d0f0e;color:#f1f1ec;font-weight:600;white-space:nowrap}
+@media(max-width:620px){.legal-table{display:block;overflow-x:auto}}
+.legal-links{display:inline-flex;gap:6px;flex-wrap:wrap}.legal-links a:hover{color:#f1f1ec}
+.legal-table td:first-child{white-space:nowrap}

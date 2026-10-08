@@ -48,7 +48,7 @@ export const server=http.createServer(async(req,res)=>{
  }
  if(req.method!=='GET'&&req.method!=='HEAD'){res.writeHead(405);res.end();return;}
  // Fixed allowlist: keys, source and local files are never served.
- const name=path==='/'?'index.html':path==='/pricing'?'pricing.html':path==='/login'?'login.html':(['/app','/app/'].includes(path)?'app/index.html':path.slice(1));const allowed=['index.html','app/index.html','app.js','metrics.mjs','graphic.mjs','coach.mjs','coach-core.mjs','style.css','landing.css','landing.js','access.mjs','login.html','login.js','pricing.html','pricing.css','pricing.js','banner1006-2.png','moster-banner3.png','moster-banner4.png'];
+ const name=path==='/'?'index.html':path==='/pricing'?'pricing.html':path==='/login'?'login.html':path==='/terms'?'terms.html':path==='/privacy'?'privacy.html':(['/app','/app/'].includes(path)?'app/index.html':path.slice(1));const allowed=['index.html','app/index.html','app.js','metrics.mjs','graphic.mjs','coach.mjs','coach-core.mjs','style.css','landing.css','landing.js','access.mjs','login.html','login.js','terms.html','privacy.html','legal.css','pricing.html','pricing.css','pricing.js','banner1006-2.png','moster-banner3.png','moster-banner4.png'];
  if(!allowed.includes(name)){res.writeHead(404);res.end();return;}
  try{const data=await readFile(new URL(name,root));res.writeHead(200,{'Content-Type':name.endsWith('.html')?'text/html; charset=utf-8':name.endsWith('.css')?'text/css':name.endsWith('.png')?'image/png':'application/javascript','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'});res.end(req.method==='HEAD'?undefined:data);}catch{res.writeHead(404);res.end();}
 });

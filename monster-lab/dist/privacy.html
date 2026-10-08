@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080908">
+  <title>隱私權政策 — Moster Lab</title>
+  <meta name="description" content="Moster Lab 隱私權政策：收集哪些資料、如何處理你的影片、與誰分享">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2714%27 fill=%27%23080908%27 stroke=%27%239c9f99%27/%3E%3Ctext x=%2716%27 y=%2721%27 text-anchor=%27middle%27 font-size=%2714%27 fill=%27%23f1f1ec%27 font-family=%27Arial%27%3EM%3C/text%3E%3C/svg%3E">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/landing.css?v=launch-8">
+  <link rel="stylesheet" href="/pricing.css?v=4">
+  <link rel="stylesheet" href="/legal.css?v=1">
+</head>
+<body>
+  <header class="site-header">
+    <a class="wordmark" href="/" aria-label="Moster Lab home"><span class="mark">M</span><span>MOSTER <span class="wordmark-light">LAB</span></span></a>
+    <nav aria-label="Main navigation"><a href="/pricing">方案</a><a class="nav-cta" href="/app/">ENTER THE LAB <span>↗</span></a></nav>
+    <button class="menu-toggle" aria-label="Open navigation" aria-expanded="false"><span></span><span></span></button>
+  </header>
+  <main class="pricing narrow legal">
+    <div class="micro-label"><span>PRIVACY</span><span>最後更新 2026-10-08</span></div>
+    <h1>隱私權政策</h1>
+
+    <p class="lead">這份政策說明 Moster Lab 收集哪些資料、為什麼收集、交給誰處理，以及你可以怎麼處理自己的資料。聯絡信箱：<a href="mailto:gentleyehstudio@gmail.com">gentleyehstudio@gmail.com</a>。</p>
+
+    <h2>1. 我們收集什麼</h2>
+    <table class="legal-table">
+      <thead><tr><th>資料</th><th>用途</th><th>保存</th></tr></thead>
+      <tbody>
+        <tr><td>Email</td><td>登入、寄送登入連結、對應你的方案與次數、客服聯繫</td><td>帳號存續期間；你要求刪除時移除</td></tr>
+        <tr><td>方案與使用紀錄（方案類型、到期日、剩餘／已用次數、優惠碼兌換）</td><td>判斷你能否使用 AI 分析、防止重複使用</td><td>與帳號相同；部分計數最長保存 90 天</td></tr>
+        <tr><td>登入連結憑證</td><td>驗證登入</td><td>15 分鐘，使用後立即失效</td></tr>
+        <tr><td>登入狀態 Cookie</td><td>讓你在這個瀏覽器保持登入</td><td>30 天，或你按「登出」</td></tr>
+        <tr><td>請求頻率計數</td><td>防止濫用（依 Email／連線來源雜湊）</td><td>約 1 小時</td></tr>
+        <tr><td>付款資訊（Stripe 客戶編號、訂閱狀態）</td><td>開通、續訂、取消、退款處理</td><td>依帳務與法令要求</td></tr>
+      </tbody>
+    </table>
+    <p>我們<strong>不</strong>儲存你的完整信用卡資料（由 Stripe 處理），也<strong>不</strong>在伺服器保存你的原始影片、音訊、取樣畫面或 AI 分析結果。</p>
+
+    <h2>2. 你的影片如何處理</h2>
+    <ul>
+      <li>影片回放與骨架（姿勢）偵測在你的瀏覽器內完成，原始影片檔與音訊<strong>不會上傳</strong>。</li>
+      <li>只有在你按下 AI 分析並勾選同意後，瀏覽器才會把<strong>最多 36 張縮小的 JPEG 取樣畫面</strong>、取樣時間、本機姿勢量測數值（約每秒 15 點）、運動種類與拍攝設定，經我們的伺服器轉送給 OpenAI 產生文字建議。</li>
+      <li>我們在向 OpenAI 的請求中要求不儲存內容；但 OpenAI 仍可能依其政策為安全與濫用偵測暫時保留 API 資料，詳見 OpenAI 的說明。</li>
+      <li>分析結果顯示在你的瀏覽器；你匯出的報告與圖片只存在你自己的裝置。</li>
+      <li>畫面中若出現臉部或身體，屬於可識別的個人影像。請勿上傳你沒有權利或同意使用的影片。</li>
+    </ul>
+
+    <h2>3. 我們與誰分享資料</h2>
+    <table class="legal-table">
+      <thead><tr><th>服務商</th><th>做什麼</th><th>會接觸的資料</th></tr></thead>
+      <tbody>
+        <tr><td>OpenAI</td><td>AI 影片分析</td><td>你同意送出的取樣畫面與量測資料</td></tr>
+        <tr><td>Stripe</td><td>付款與訂閱</td><td>Email、付款資訊、交易紀錄</td></tr>
+        <tr><td>Resend</td><td>寄送登入信</td><td>Email、登入信內容</td></tr>
+        <tr><td>Vercel</td><td>網站與伺服器代管</td><td>連線紀錄（如 IP）、請求內容的暫時處理</td></tr>
+        <tr><td>Upstash</td><td>資料庫（方案與使用紀錄）</td><td>Email、方案與使用紀錄</td></tr>
+      </tbody>
+    </table>
+    <p>這些服務商可能位於臺灣以外的地區，資料會跨境傳輸，並受其各自的隱私政策與安全措施約束。我們不會出售你的個人資料，也不會為廣告目的分享。除上述服務商外，只有在法律要求時才會揭露。</p>
+
+    <h2>4. Cookie 與追蹤</h2>
+    <p>本服務只使用維持登入所需的功能性 Cookie（HttpOnly），目前沒有廣告或第三方行為追蹤 Cookie。網站透過 Google Fonts 載入字型，Google 可能因此收到你的連線資訊。</p>
+
+    <h2>5. 你的權利</h2>
+    <p>你可以請求查詢、更正、複製、停止使用或刪除與你有關的個人資料。請從你登入用的 Email 來信 <a href="mailto:gentleyehstudio@gmail.com">gentleyehstudio@gmail.com</a>，我們會在合理期間內回覆。刪除帳號後，與帳務、稅務或爭議處理有關而依法須保留的資料，會在法定期間內保留。</p>
+
+    <h2>6. 安全</h2>
+    <p>登入採一次性連結，不使用密碼；連線全程加密；登入狀態以簽章與 HttpOnly Cookie 保護。但沒有任何系統能保證絕對安全，若發生可能影響你的資料事件，我們會依法通知。</p>
+
+    <h2>7. 未成年人</h2>
+    <p>本服務不是為 18 歲以下者單獨使用而設計。未成年人請在法定代理人同意與陪同下使用，並由其決定是否送出影片畫面。</p>
+
+    <h2>8. 政策更新</h2>
+    <p>我們可能更新本政策，更新後會修改頁面上方的日期；重大變更會另行通知。</p>
+
+  </main>
+  <footer><a class="wordmark" href="/"><span class="mark">M</span><span>MOSTER <span class="wordmark-light">LAB</span></span></a><span class="legal-links"><a href="/terms">服務條款</a> · <a href="/privacy">隱私權政策</a> · <a href="mailto:gentleyehstudio@gmail.com">聯絡我們</a></span><span>© MOSTER LAB</span></footer>
+  <script src="/landing.js?v=launch-3" defer></script>
+</body>
+</html>
