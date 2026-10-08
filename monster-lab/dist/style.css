@@ -121,3 +121,4 @@ body.v1 .primary:disabled,body.v1 #coachAnalyze:disabled{background:#dedfdb;colo
 .steps{list-style:none;display:flex;gap:6px;margin:0 0 4px;padding:0;counter-reset:st}.steps li{counter-increment:st;flex:1;font-size:12px;padding:6px 8px;border-radius:6px;background:#e4eadb;color:#7a8070}
 .steps li::before{content:counter(st) ". "}.steps li.on{background:#171917;color:#fff;font-weight:700}.steps li.done{background:#cfe0bd;color:#2f4a1f}.steps li.done::before{content:"✓ "}
 #accessOut input{width:100%;box-sizing:border-box}
+.app-legal{text-align:center;font-size:12px;color:#888;margin:28px 0 36px}.app-legal a{color:inherit;text-decoration:underline}
