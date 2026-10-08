@@ -68,13 +68,13 @@ export function createCoach({getState,video,seek,onLock,onReview}){
  function showAccess(a){const out=!a.user,none=!!a.user&&!a.valid,ready=!!a.user&&!!a.valid;$('accessOut').hidden=!out;$('accessNone').hidden=!none;$('accessReady').hidden=!ready;
   $('stepLogin').className=out?'on':'done';$('stepCredit').className=out?'':none?'on':'done';$('stepGo').className=ready?'on':'';
   $('accessUser1').textContent=$('accessUser2').textContent=a.user||'';
-  $('accessPlan').textContent=a.plan?`${a.planLabel}，剩餘 ${a.remaining} 次分析`:'';}
+  $('accessPlan').textContent=a.plan?`${a.planLabel}，剩餘 ${a.remaining} 次分析（已綁定帳號，不用再輸入優惠碼）`:'';}
  function applyStatus(s){const a=s.access||{};currentUser=a.user||null;const enforced=a.mode==='enforced',ok=!enforced||a.valid;configured=!!s.configured&&ok;$('coachAccess').hidden=!enforced||!!a.error;if(enforced&&!a.error)showAccess(a);const el=$('coachConnection');
   if(a.error)el.textContent=a.error;
   else if(!s.configured)el.textContent=enforced?'AI 分析暫時無法使用（伺服器尚未啟用）。影片回放與骨架分析仍可本機使用。':'AI 建議尚未啟用：伺服器沒有 API 金鑰。請關閉舊的服務終端，再執行「啟用AI.command」並於終端提示輸入金鑰。影片回放與骨架分析仍可本機使用。';
   else if(enforced&&!a.user)el.textContent='影片回放與骨架分析免費使用。要用 AI 分析，請先在下方登入。';
   else if(!ok)el.textContent=a.plan?`「${a.planLabel}」的分析次數已用完，可再兌換優惠碼或購買。`:'已登入，但還沒有分析次數：輸入優惠碼可免費分析 1 次。';
-  else if(enforced)el.textContent='可以開始了：勾選下方同意後按「檢視」。OpenAI 服務僅在你同意後傳送畫面。';
+  else if(enforced)el.textContent='可以開始了：你的優惠碼／方案已綁定在帳號上，不用再輸入。勾選下方同意後按「檢視」即可。';
   else el.textContent='OpenAI 服務已連線，僅在你同意後傳送畫面。';sync();}
  function refreshStatus(){return fetchStatus().then(applyStatus).catch(()=>{$('coachConnection').textContent='目前為靜態預覽，AI 服務未啟動。請使用專案的本機伺服器。';});}
  $('accessSend').onclick=async()=>{const note=$('accessNote'),btn=$('accessSend'),email=$('accessEmail').value.trim();if(!email){note.textContent='請輸入 Email。';return;}btn.disabled=true;note.textContent='寄送中…';try{await requestLogin(email,$('accessCode').value,'/app/');note.textContent=`已寄到 ${email}。到信箱點連結登入後，會自動回到這裡${$('accessCode').value.trim()?'並兌換優惠碼':''}。`;}catch(e){note.textContent=e.message;}finally{btn.disabled=false;}};

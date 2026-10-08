@@ -18,7 +18,7 @@ function render() {
   $('accessState').textContent = !enforced ? '目前為本機模式，不需登入。'
     : a.error ? a.error
     : !a.user ? '尚未登入。登入後才能兌換優惠碼或訂閱。'
-    : a.plan ? `${a.user}　·　${a.planLabel}，剩餘 ${a.remaining} 次分析。` : `${a.user}　·　尚無方案。`;
+    : a.plan ? `${a.user}　·　${a.planLabel}，剩餘 ${a.remaining} 次分析。已綁定在你的帳號，上傳頁不用再輸入優惠碼。` : `${a.user}　·　尚無方案。`;
   const sg = document.querySelector('[data-cta="single"]');
   if (sg) { sg.textContent = a.user ? '購買 NT$129 / 次' : '登入後購買'; sg.setAttribute('aria-disabled', String(!enforced || !!a.error)); }
   const m = document.querySelector('[data-cta="monthly"]'), p = document.querySelector('[data-cta="project"]');
@@ -49,7 +49,7 @@ $('redeemForm').addEventListener('submit', async (e) => {
       note.textContent = `已寄到 ${email}。到信箱點連結登入後，優惠碼會自動兌換並帶你去上傳影片。`;
     } else {
       const r = await redeem(code);
-      $('redeemInput').value = ''; note.innerHTML = `已啟用「${r.planLabel}」。<a href="/app/">前往上傳影片 ↗</a>`;
+      $('redeemInput').value = ''; note.innerHTML = `已啟用「${r.planLabel}」，剩餘 ${r.remaining} 次分析。<strong>不用在上傳頁再輸入優惠碼</strong>，直接 <a href="/app/">前往上傳影片 ↗</a>`;
       refresh();
     }
   } catch (err) { note.textContent = err.message; } finally { btn.disabled = false; }
