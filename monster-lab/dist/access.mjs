@@ -11,7 +11,9 @@ export async function fetchStatus() {
   if (!r.ok) throw new Error('status');
   return r.json();
 }
-export const requestLogin = (email) => post('/api/auth/request', { email });
+// code (optional promo) is checked immediately and redeemed automatically when the emailed link is opened;
+// next (/app/ or /pricing) is where that link sends the person afterwards.
+export const requestLogin = (email, code = '', next = '') => post('/api/auth/request', { email, code, next });
 export const verifyLogin = (token) => post('/api/auth/verify', { token });
 export const logout = () => post('/api/auth/logout');
 export const redeem = (code) => post('/api/redeem', { code: String(code || '').trim() });

@@ -114,3 +114,10 @@ body.v1 .primary:disabled,body.v1 #coachAnalyze:disabled{background:#dedfdb;colo
 #stage #empty{z-index:2}
 #stage #stageBadge{z-index:3}
 .access-box{margin:12px 0 0;display:grid;gap:6px}.access-box label{font-size:12px;font-weight:700}.access-row{display:flex;gap:8px}.access-row input{flex:1;min-width:0;padding:9px 11px;border:1px solid #c9d2bb;border-radius:7px;font:13px 'DM Mono',monospace;background:#fff}.access-row button{padding:9px 16px;border:0;border-radius:7px;background:#171917;color:#fff;cursor:pointer}.access-box small{font-size:11px;color:#5f6558}
+
+.access-box{margin:12px 0 0;display:grid;gap:8px}.access-box input{padding:9px 11px;border:1px solid #c9d2bb;border-radius:7px;font:13px 'DM Mono',monospace;background:#fff;min-width:0}
+.access-box button{padding:9px 16px;border:0;border-radius:7px;background:#171917;color:#fff;cursor:pointer}.access-box button:disabled{opacity:.6}
+.access-msg{margin:0;font-size:13px;line-height:1.7}.access-box .linkbtn{background:none;color:#5f6558;text-decoration:underline;padding:0}
+.steps{list-style:none;display:flex;gap:6px;margin:0 0 4px;padding:0;counter-reset:st}.steps li{counter-increment:st;flex:1;font-size:12px;padding:6px 8px;border-radius:6px;background:#e4eadb;color:#7a8070}
+.steps li::before{content:counter(st) ". "}.steps li.on{background:#171917;color:#fff;font-weight:700}.steps li.done{background:#cfe0bd;color:#2f4a1f}.steps li.done::before{content:"✓ "}
+#accessOut input{width:100%;box-sizing:border-box}

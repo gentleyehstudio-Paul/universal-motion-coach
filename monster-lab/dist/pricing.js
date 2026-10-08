@@ -1,4 +1,4 @@
-import { fetchStatus, redeem, logout, startCheckout, openPortal } from './access.mjs?v=3';
+import { fetchStatus, redeem, requestLogin, logout, startCheckout, openPortal } from './access.mjs?v=4';
 
 // Fill once a booking/contact channel exists (LINE, form, ...). The project plan is booked, not checked out.
 const PROJECT_LINK = '';
@@ -12,12 +12,13 @@ function render() {
   $('loginLink').hidden = !enforced || !!a.user;
   $('logoutBtn').hidden = !a.user;
   $('portalBtn').hidden = !a.canManageBilling;
-  $('ticketForm').hidden = !a.user;
+  $('redeemEmailWrap').hidden = !!a.user;
+  $('redeemBtn').textContent = a.user ? '兌換' : '寄登入連結並兌換';
+  $('goApp').hidden = !(a.user && a.valid);
   $('accessState').textContent = !enforced ? '目前為本機模式，不需登入。'
     : a.error ? a.error
     : !a.user ? '尚未登入。登入後才能兌換優惠碼或訂閱。'
     : a.plan ? `${a.user}　·　${a.planLabel}，剩餘 ${a.remaining} 次分析。` : `${a.user}　·　尚無方案。`;
-  $('redeemNote').textContent = enforced && !a.user ? '請先登入再兌換。' : '';
   const sg = document.querySelector('[data-cta="single"]');
   if (sg) { sg.textContent = a.user ? '購買 NT$129 / 次' : '登入後購買'; sg.setAttribute('aria-disabled', String(!enforced || !!a.error)); }
   const m = document.querySelector('[data-cta="monthly"]'), p = document.querySelector('[data-cta="project"]');
@@ -34,18 +35,25 @@ for (const plan of ['single', 'monthly']) document.querySelector(`[data-cta="${p
 });
 $('portalBtn').addEventListener('click', () => openPortal().catch((err) => { $('accessState').textContent = err.message; }));
 $('logoutBtn').addEventListener('click', async () => { await logout().catch(() => {}); refresh(); });
-async function submitCode(e, input, note) {
+// One form, one entry: logged out -> email + code in a single step (code is redeemed when the link is opened);
+// logged in -> just the code.
+$('redeemForm').addEventListener('submit', async (e) => {
   e.preventDefault();
-  if (!status?.access?.user) { location.href = '/login?next=/pricing'; return; }
-  note.textContent = '驗證中…';
+  const note = $('redeemNote'), code = $('redeemInput').value, btn = $('redeemBtn');
+  btn.disabled = true; note.textContent = '處理中…';
   try {
-    const r = await redeem(input.value);
-    input.value = ''; note.innerHTML = `已啟用「${r.planLabel}」。<a href="/app/">前往上傳影片 ↗</a>`;
-    refresh();
-  } catch (err) { note.textContent = err.message; }
-}
-$('redeemForm').addEventListener('submit', (e) => submitCode(e, $('redeemInput'), $('redeemNote')));
-$('ticketForm').addEventListener('submit', (e) => submitCode(e, $('ticketInput'), $('ticketNote')));
+    if (!status?.access?.user) {
+      const email = $('redeemEmail').value.trim();
+      if (!email) throw new Error('請輸入 Email。');
+      await requestLogin(email, code, '/app/');
+      note.textContent = `已寄到 ${email}。到信箱點連結登入後，優惠碼會自動兌換並帶你去上傳影片。`;
+    } else {
+      const r = await redeem(code);
+      $('redeemInput').value = ''; note.innerHTML = `已啟用「${r.planLabel}」。<a href="/app/">前往上傳影片 ↗</a>`;
+      refresh();
+    }
+  } catch (err) { note.textContent = err.message; } finally { btn.disabled = false; }
+});
 if (new URLSearchParams(location.search).get('paid')) $('accessState').textContent = '付款完成，方案開通中（通常幾秒內）…';
 refresh();
 if (new URLSearchParams(location.search).get('paid')) setTimeout(refresh, 4000);
