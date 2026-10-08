@@ -1,6 +1,7 @@
 import { createHandlers } from '../access/handlers.mjs';
 import { storeFromEnv } from '../access/store.mjs';
 import { resendMailer } from '../access/mail.mjs';
+import { allowedOrigins } from '../access/origin.mjs';
 import { makeCallModel, loadKnowledge } from '../access/model.mjs';
 
 const env = process.env;
@@ -23,8 +24,10 @@ export const route = (method, fn, opts = {}) => async (req, res) => {
   const send = (status, body) => res.status(status).json(body);
   if (req.method !== method) return send(405, { error: '不支援的請求方法。' });
   if (method === 'POST' && !opts.raw) {
-    const site = env.SITE_ORIGIN; // e.g. https://moster-lab.com
-    if (req.headers['x-motion-lab'] !== '1' || (site && req.headers.origin && req.headers.origin !== site)) return send(403, { error: '請由 Moster Lab 網站發送。' });
+    const allowed = allowedOrigins(env.SITE_ORIGIN); // e.g. https://mosterlab.com (also accepts the www twin)
+    if (req.headers['x-motion-lab'] !== '1') return send(403, { error: '請由 Moster Lab 網站發送。' });
+    const from = req.headers.origin;
+    if (allowed.length && from && !allowed.includes(from)) return send(403, { error: '來源網址與伺服器設定的網站網址（SITE_ORIGIN）不一致，請站長檢查設定。' });
   }
   try {
     const r = await fn(opts.raw ? { headers: req.headers, rawBody: await readRaw(req) } : { headers: req.headers, body: req.body });

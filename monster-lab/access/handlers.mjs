@@ -3,6 +3,7 @@ import { verifyTicket, parsePromoCode } from './tickets.mjs';
 import { normalizeEmail, sha, newLoginToken, signSession, verifySession, readCookie, sessionCookie, SESSION_COOKIE } from './session.mjs';
 import { getGrants, upsertGrant } from './accounts.mjs';
 import { loginMail } from './mail.mjs';
+import { normalizeOrigin } from './origin.mjs';
 import { createCheckout, createPortal, verifyWebhook } from './stripe.mjs';
 import { validateFrames, validateReview } from '../ai-policy.mjs';
 
@@ -18,7 +19,7 @@ export function createHandlers(ctx) {
   const env = ctx.env, secret = env.ACCESS_SECRET, enforced = ctx.mode === 'enforced';
   const store = ctx.store;
   // Trusted origin only (never the Host header): it ends up inside emailed login links.
-  const origin = () => (env.SITE_ORIGIN || (env.VERCEL_URL ? `https://${env.VERCEL_URL}` : '')).replace(/\/$/, '');
+  const origin = () => normalizeOrigin(env.SITE_ORIGIN) || (env.VERCEL_URL ? normalizeOrigin(env.VERCEL_URL) : '');
   const secure = () => origin().startsWith('https://');
   const misconfigured = () => enforced && (!secret || !store.persistent) ? '權限服務尚未設定完成（ACCESS_SECRET／資料庫）。' : null;
   const userOf = (headers) => verifySession(secret, readCookie(headers.cookie, SESSION_COOKIE), now())?.sub ?? null;

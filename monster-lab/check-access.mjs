@@ -37,6 +37,16 @@ const code = makePromoCode(S);
 assert.ok(parsePromoCode(S, code));
 assert.equal(parsePromoCode('other', code), null);
 
+// SITE_ORIGIN typed by hand
+import { normalizeOrigin, allowedOrigins } from './access/origin.mjs';
+assert.equal(normalizeOrigin('mosterlab.com'), 'https://mosterlab.com');
+assert.equal(normalizeOrigin(' https://MosterLab.com/ '), 'https://mosterlab.com');
+assert.equal(normalizeOrigin('https://mosterlab.com/login'), 'https://mosterlab.com');
+assert.equal(normalizeOrigin(''), '');
+assert.deepEqual(allowedOrigins('mosterlab.com'), ['https://mosterlab.com', 'https://www.mosterlab.com']);
+assert.deepEqual(allowedOrigins('https://www.mosterlab.com/'), ['https://www.mosterlab.com', 'https://mosterlab.com']);
+{ const { h, sent } = make({ env: { SITE_ORIGIN: 'mosterlab.com/' } }); await h.authRequest({ headers: {}, body: { email: 'a@b.co' } }); assert.match(sent[0].text, /https:\/\/mosterlab\.com\/login#token=/); }
+
 // sessions
 assert.equal(normalizeEmail(' A@B.co '), 'a@b.co');
 assert.equal(normalizeEmail('not-an-email'), null);
