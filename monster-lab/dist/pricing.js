@@ -1,7 +1,9 @@
 import { fetchStatus, redeem, requestLogin, logout, startCheckout, openPortal } from './access.mjs?v=4';
 
 // Fill once a booking/contact channel exists (LINE, form, ...). The project plan is booked, not checked out.
-const PROJECT_LINK = '';
+const CONTACT_EMAIL = 'gentleyehstudio@gmail.com';
+const PROJECT_LINK = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('專案陪跑預約洽談')}&body=${encodeURIComponent(
+  '你好，我想預約「專案陪跑」。\n\n姓名：\n聯絡方式（LINE／電話）：\n想練習的運動（籃球投籃／高爾夫揮桿／其他）：\n方便的縣市或地點：\n希望的時間：\n目前遇到的問題或想改善的地方：\n')}`;
 
 const $ = (id) => document.getElementById(id);
 let status = null;

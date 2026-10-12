@@ -39,3 +39,6 @@ body{font-family:Manrope,'Noto Sans TC',sans-serif}
 .primary{padding:13px 18px;background:#eeeeea;color:#0a0c0a;border:0;font:12px "DM Mono",monospace;letter-spacing:.08em;cursor:pointer;border-radius:2px}
 .primary:disabled{opacity:.6;cursor:wait}
 #sentBox .cta{width:auto;background:transparent;color:inherit;cursor:pointer;padding:10px 18px}
+.plan-note{display:block;margin-top:2px;font-size:11px;line-height:1.7;color:#8d918a}
+.plan ul{align-content:start}
+#goApp[hidden]{display:none}
