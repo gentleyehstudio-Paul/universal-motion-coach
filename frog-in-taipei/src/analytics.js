@@ -21,8 +21,20 @@ export function initAnalytics(c) {
   cfg = { ...cfg, ...c };
   try {
     const p = new URLSearchParams(location.search);
+    if (p.get('debug') === '1') cfg.debug = true; // ?debug=1 prints events to the console
     for (const k of ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content']) if (p.get(k)) utm[k] = p.get(k);
   } catch { /* ignore */ }
+  if (cfg.measurementId) {
+    // GA4: events are mirrored through gtag in addition to dataLayer
+    const el = document.createElement('script');
+    el.async = true;
+    el.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(cfg.measurementId);
+    document.head.appendChild(el);
+    window[cfg.dataLayerName] = window[cfg.dataLayerName] || [];
+    window.gtag = function () { window[cfg.dataLayerName].push(arguments); };
+    window.gtag('js', new Date());
+    window.gtag('config', cfg.measurementId);
+  }
 }
 
 export function track(event, params = {}) {
@@ -31,6 +43,7 @@ export function track(event, params = {}) {
     const dl = (window[cfg.dataLayerName] = window[cfg.dataLayerName] || []);
     dl.push(payload);
   } catch { /* ignore */ }
+  if (cfg.measurementId && window.gtag) window.gtag('event', event, { ...utm, ...params });
   if (cfg.beaconUrl) {
     try { navigator.sendBeacon(cfg.beaconUrl, JSON.stringify(payload)); } catch { /* ignore */ }
   }

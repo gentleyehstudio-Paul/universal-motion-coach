@@ -48,6 +48,7 @@ async function boot() {
   track('site_enter', { referrer: document.referrer || '' });
   startAttract();
   showTitle();
+  if (new URLSearchParams(location.search).get('level') === '2') actions.skip2(); // demo link straight to level 2
   requestAnimationFrame(loop);
   window.__game = { get sim() { return sim; }, get run() { return run; }, cfg, renderer, api, get mode() { return mode; } }; // handy for debugging / tests
 }
@@ -227,6 +228,7 @@ function showTitle() {
   c.fillStyle = 'rgba(255,255,255,.4)'; c.fillRect(96, 98, 14, 3);
   show(`
     <div class="center" id="logo-slot"></div>
+    ${cfg.brand.poc ? '<div class="center"><span class="poc-badge">POC 示範版</span></div>' : ''}
     <h1>樹蛙進城<small>FROG IN TAIPEI</small></h1>
     <p class="center">一隻口渴的翡翠樹蛙在台北街頭迷路了。<br>踩著騎士的安全帽，跳過車流——先喝一杯，再吃一鍋！</p>
     <div class="steps">
@@ -241,6 +243,8 @@ function showTitle() {
       <button class="btn sec" data-act="mute">${audio.muted ? '🔇' : '🔊'}</button>
     </div>
     <p class="muted center" style="margin-top:12px">免登入就能玩・單指操作・約 2–5 分鐘一局</p>
+    ${cfg.brand.poc ? `<p class="poc-note">${esc(cfg.brand.pocNotice)}</p>
+    <div class="row"><button class="btn sec" data-act="skip2">直接體驗第二關</button><button class="btn sec" data-act="reset">清除試玩資料</button></div>` : ''}
   `);
   $('#logo-slot').appendChild(logo);
 }
@@ -578,6 +582,11 @@ async function openShare() {
 // ------------------------------------------------------------------ actions
 const actions = {
   start() { audio.unlock(); startRun(); },
+  skip2() { audio.unlock(); run = { segments: {} }; loginPromptShown = false; track('game_start', { level: 2, via: 'poc_shortcut' }); showIntro(1); },
+  reset() {
+    try { for (const k of Object.keys(localStorage)) if (k.startsWith('fit.')) localStorage.removeItem(k); } catch { /* ignore */ }
+    location.reload();
+  },
   go() { beginLevel(); },
   resume() { hide(); mode = 'play'; acc = 0; },
   retry() { track('retry', { level: sim.levelIdx + 1 }); showIntro(sim.levelIdx); },

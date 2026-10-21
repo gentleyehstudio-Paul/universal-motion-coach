@@ -9,6 +9,8 @@
     "cardstoxCta": "收集卡很好玩？看看你手上的卡值多少。",
     "cardstoxButton": "前往 Cardstox 查卡價",
     "organizer": "Cardstox",
+    "poc": true,
+    "pocNotice": "POC 示範版：登入、優惠券與排行榜皆為模擬資料，僅存在你的手機瀏覽器，不會寄信或上傳；店家招牌與優惠內容為示意。",
     "contestNote": "排行榜成績將經過系統驗證；主辦方保有最終審核與取消資格之權利。"
   },
 
@@ -50,7 +52,8 @@
   },
 
   "analytics": {
-    "debug": true,
+    "debug": false,
+    "measurementId": "",
     "dataLayerName": "dataLayer",
     "beaconUrl": ""
   },
