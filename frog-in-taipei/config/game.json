@@ -1,0 +1,204 @@
+{
+  "version": "0.1.0",
+
+  "brand": {
+    "gameName": "樹蛙進城",
+    "gameNameEn": "Frog in Taipei",
+    "url": "game.cardstox.com.tw",
+    "cardstoxUrl": "https://cardstox.com.tw/?utm_source=frog-in-taipei&utm_medium=game&utm_campaign=launch",
+    "cardstoxCta": "收集卡很好玩？看看你手上的卡值多少。",
+    "cardstoxButton": "前往 Cardstox 查卡價",
+    "organizer": "Cardstox",
+    "contestNote": "排行榜成績將經過系統驗證；主辦方保有最終審核與取消資格之權利。"
+  },
+
+  "world": { "width": 270, "unit": 34, "laneHeight": 30 },
+
+  "frog": {
+    "jumpMaxUnits": 3,
+    "overshootAtUnits": 3.5,
+    "chargeMaxUnits": 4.5,
+    "minJumpUnits": 0.45,
+    "chargeSeconds": 1.5,
+    "jumpSeconds": 0.38,
+    "landAssistPx": 4
+  },
+
+  "stay": {
+    "helmet": 2,
+    "roof": 4,
+    "tutorialSeconds": 10,
+    "tutorialHelmet": 3
+  },
+
+  "lives": 3,
+
+  "thirst": {
+    "durationSeconds": 120,
+    "dropRefill": 12,
+    "lowWarning": 25
+  },
+
+  "score": { "perRow": 30, "drop": 20, "clear": 300, "perThirstPct": 3, "perLife": 50 },
+
+  "traffic": { "accel": 80, "densityMultiplier": 1.0, "speedMultiplier": 1.0 },
+
+  "api": {
+    "mode": "mock",
+    "baseUrl": "https://api.cardstox.com.tw/v1/frog",
+    "googleClientId": ""
+  },
+
+  "analytics": {
+    "debug": true,
+    "dataLayerName": "dataLayer",
+    "beaconUrl": ""
+  },
+
+  "leaderboard": { "topN": 20, "minWinTicks": 480 },
+
+  "cardCountOptions": [
+    { "id": "none", "label": "沒有" },
+    { "id": "1-50", "label": "1–50 張" },
+    { "id": "51-500", "label": "51–500 張" },
+    { "id": "500+", "label": "500 張以上" }
+  ],
+
+  "privacy": {
+    "version": "2026-10-draft",
+    "consentCardstox": "我同意 Cardstox 寄送卡牌行情與優惠資訊",
+    "consentPartner": "我同意石研室寄送餐廳優惠資訊",
+    "noticeTitle": "個人資料蒐集告知（草稿，上線前請法務確認）",
+    "notice": [
+      ["蒐集機關", "Cardstox（以下稱本公司）"],
+      ["蒐集目的", "遊戲成績保存與排行榜、圖鑑卡收集、優惠券發放與核銷、經您另行勾選同意之行銷資訊寄送、活動分析。"],
+      ["個資類別", "電子郵件、遊戲成績、持卡量區間（匿名統計用）、您的同意紀錄。"],
+      ["利用期間", "活動期間及結束後一年；您撤回同意或要求刪除時，立即停止利用。"],
+      ["利用地區與對象", "中華民國境內；本公司，以及您另行勾選同意之合作店家（石研室）。未勾選者不會提供給合作店家。"],
+      ["您的權利", "得向本公司請求查詢、閱覽、製給複製本、補充或更正、停止蒐集處理利用或刪除。聯絡方式：privacy@cardstox.example（示意）。"],
+      ["不提供的影響", "不登入仍可遊玩；未提供電子郵件則無法保存成績、進入排行榜與領取優惠券。"]
+    ]
+  },
+
+  "cards": [
+    {
+      "id": "emerald",
+      "no": 1,
+      "name": "翡翠樹蛙",
+      "sci": "Zhangixalus prasinatus",
+      "tag": "台灣特有種",
+      "rarity": "R",
+      "colors": ["#4fcf63", "#2f9e4a", "#f2f7dc"],
+      "bg": ["#1f5a46", "#7ed89a"],
+      "fact": "全身翠綠、肚皮偏白，眼睛金黃。多半棲息在中低海拔山區的樹林與水域周邊。（資料請上線前再核對）"
+    },
+    {
+      "id": "moltrecht",
+      "no": 2,
+      "name": "莫氏樹蛙",
+      "sci": "Zhangixalus moltrechti",
+      "tag": "台灣特有種",
+      "rarity": "SR",
+      "colors": ["#8fbf5a", "#5e8a3a", "#f3efd6"],
+      "bg": ["#3b3f6b", "#e0a95a"],
+      "fact": "體色會隨環境在綠色與褐色之間變化，常在低海拔池塘與水田附近活動。（資料請上線前再核對）"
+    }
+  ],
+
+  "levels": [
+    {
+      "id": "street",
+      "title": "第一關｜口渴",
+      "subtitle": "翡翠樹蛙在台北街頭迷路了。先找到手搖飲店，喝一杯解渴！",
+      "meter": "口渴值",
+      "goalHint": "外送員經過「露水茶舖」門口時，跳上他的安全帽或外送箱！",
+      "theme": "street",
+      "curbHeight": 90,
+      "light": { "green": 8, "yellow": 1, "red": 4.5 },
+      "drops": 12,
+      "store": {
+        "name": "露水茶舖",
+        "drink": "翡翠露",
+        "placeholder": false
+      },
+      "goal": { "type": "delivery", "window": [100, 190], "every": 6.5, "firstAt": 3 },
+      "reward": { "card": "emerald" },
+      "rows": [
+        { "t": "island" },
+        { "t": "lane", "dir": 1,  "speed": 26, "gap": [1.1, 2.4], "kinds": { "taxi": 3, "sedan": 3, "bus": 2, "van": 1 } },
+        { "t": "lane", "dir": -1, "speed": 30, "gap": [1.1, 2.4], "kinds": { "taxi": 3, "sedan": 3, "bus": 2, "van": 1 } },
+        { "t": "lane", "dir": 1,  "speed": 34, "gap": [1.1, 2.4], "kinds": { "taxi": 3, "sedan": 3, "bus": 2, "van": 1 } },
+        { "t": "lane", "dir": -1, "speed": 30, "gap": [1.1, 2.4], "kinds": { "taxi": 3, "sedan": 3, "bus": 2, "van": 1 } },
+        { "t": "lane", "dir": 1,  "speed": 36, "gap": [1.1, 2.4], "kinds": { "taxi": 3, "sedan": 3, "bus": 2, "van": 1 } },
+        { "t": "zone", "x": 75, "w": 120 },
+        { "t": "lane", "dir": -1, "speed": 40, "gap": [0.9, 2.0], "kinds": { "scooter": 5, "taxi": 1, "sedan": 1, "van": 1 } },
+        { "t": "lane", "dir": 1,  "speed": 44, "gap": [0.9, 2.0], "kinds": { "scooter": 5, "taxi": 1, "sedan": 1, "van": 1 } },
+        { "t": "lane", "dir": -1, "speed": 48, "gap": [0.9, 2.0], "kinds": { "scooter": 5, "taxi": 1, "sedan": 1, "van": 1 } },
+        { "t": "zone", "x": 110, "w": 100 },
+        { "t": "lane", "dir": 1,  "speed": 56, "gap": [0.7, 1.5], "kinds": { "scooter": 1 } },
+        { "t": "lane", "dir": -1, "speed": 60, "gap": [0.7, 1.5], "kinds": { "scooter": 1 } },
+        { "t": "lane", "dir": 1,  "speed": 64, "gap": [0.7, 1.5], "kinds": { "scooter": 1 } },
+        { "t": "lane", "dir": -1, "speed": 60, "gap": [0.7, 1.5], "kinds": { "scooter": 1 } },
+        { "t": "lane", "dir": 1,  "speed": 66, "gap": [0.7, 1.5], "kinds": { "scooter": 1 } },
+        { "t": "lane", "dir": 1,  "speed": 46, "gap": [1.4, 3.0], "kinds": { "scooter": 1 }, "ignoreLight": true, "delivery": true }
+      ]
+    },
+    {
+      "id": "station",
+      "title": "第二關｜肚子餓了",
+      "subtitle": "喝飽了！現在肚子咕嚕叫——台北車站、忠孝西路，一鍋熱呼呼的火鍋在 B1 等你。",
+      "meter": "飢餓值",
+      "goalHint": "跳上停在「石研室」門口、有發亮標記的騎士安全帽，搭手扶梯下 B1！",
+      "theme": "station",
+      "curbHeight": 100,
+      "light": { "green": 7, "yellow": 1, "red": 5 },
+      "drops": 14,
+      "store": {
+        "name": "石研室",
+        "branch": "北車店",
+        "signText": "石研室 北車店",
+        "placeholder": true,
+        "placeholderNote": "品牌授權取得前為佔位圖"
+      },
+      "goal": { "type": "parked" },
+      "reward": { "card": "moltrecht", "coupon": "shiyanshi-bt-01" },
+      "rows": [
+        { "t": "island" },
+        { "t": "lane", "dir": 1,  "speed": 24, "gap": [1.0, 2.2], "kinds": { "bus": 3, "taxi": 3, "sedan": 2, "van": 1 } },
+        { "t": "lane", "dir": -1, "speed": 28, "gap": [1.0, 2.2], "kinds": { "bus": 3, "taxi": 3, "sedan": 2, "van": 1 } },
+        { "t": "lane", "dir": 1,  "speed": 32, "gap": [1.0, 2.2], "kinds": { "bus": 3, "taxi": 3, "sedan": 2, "van": 1 } },
+        { "t": "lane", "dir": -1, "speed": 30, "gap": [1.0, 2.2], "kinds": { "bus": 3, "taxi": 3, "sedan": 2, "van": 1 } },
+        { "t": "lane", "dir": 1,  "speed": 34, "gap": [1.0, 2.2], "kinds": { "bus": 3, "taxi": 3, "sedan": 2, "van": 1 } },
+        { "t": "zone", "x": 60, "w": 110 },
+        { "t": "lane", "dir": -1, "speed": 42, "gap": [0.9, 1.9], "kinds": { "scooter": 5, "taxi": 1, "bus": 1, "van": 1 } },
+        { "t": "lane", "dir": 1,  "speed": 46, "gap": [0.9, 1.9], "kinds": { "scooter": 5, "taxi": 1, "bus": 1, "van": 1 } },
+        { "t": "lane", "dir": -1, "speed": 50, "gap": [0.9, 1.9], "kinds": { "scooter": 5, "taxi": 1, "bus": 1, "van": 1 } },
+        { "t": "zone", "x": 130, "w": 110 },
+        { "t": "lane", "dir": 1,  "speed": 58, "gap": [0.7, 1.5], "kinds": { "scooter": 1 } },
+        { "t": "lane", "dir": -1, "speed": 62, "gap": [0.7, 1.5], "kinds": { "scooter": 1 } },
+        { "t": "lane", "dir": 1,  "speed": 66, "gap": [0.7, 1.5], "kinds": { "scooter": 1 } },
+        { "t": "lane", "dir": -1, "speed": 62, "gap": [0.7, 1.5], "kinds": { "scooter": 1 } },
+        { "t": "zone", "x": 70, "w": 120 },
+        { "t": "lane", "dir": 1,  "speed": 60, "gap": [0.7, 1.5], "kinds": { "scooter": 1 } },
+        { "t": "lane", "dir": -1, "speed": 64, "gap": [0.7, 1.5], "kinds": { "scooter": 1 } },
+        { "t": "parking", "h": 34, "bays": [26, 58, 90, 122, 154, 186, 218, 246], "goalBay": 4 }
+      ]
+    }
+  ],
+
+  "coupons": {
+    "shiyanshi-bt-01": {
+      "title": "石研室 北車店 招待優惠券",
+      "benefit": "（示意）依石研室實際提供之優惠內容填寫，例如：招待飲品一杯。",
+      "terms": [
+        "每位玩家限領一張，請於北車店 B1 結帳前出示 QR code 由店員核銷。",
+        "不得與其他優惠併用；詳細辦法以門市公告為準。",
+        "優惠內容與有效期限為示意資料，正式上線前由石研室確認。"
+      ],
+      "validFrom": "2026-11-01",
+      "validUntil": "2026-12-31",
+      "supplyLimit": 500,
+      "codePrefix": "FROG"
+    }
+  }
+}

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#10261f">
+  <title>樹蛙進城｜Frog in Taipei</title>
+  <meta name="description" content="一隻口渴的翡翠樹蛙在台北街頭迷路了！踩著安全帽跳過車流，先喝一杯、再吃一鍋。單指操作、免登入、30 秒上手的小遊戲。">
+  <meta property="og:title" content="樹蛙進城｜Frog in Taipei">
+  <meta property="og:description" content="踩著安全帽跳過車流，幫翡翠樹蛙喝到飲料、找到火鍋！">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='4' fill='%234fcf63'/%3E%3Ccircle cx='5' cy='6' r='2.4' fill='%23ff8a2a'/%3E%3Ccircle cx='11' cy='6' r='2.4' fill='%23ff8a2a'/%3E%3Ccircle cx='5' cy='6' r='1.4' fill='%23f6d55c'/%3E%3Ccircle cx='11' cy='6' r='1.4' fill='%23f6d55c'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app">
+    <div id="stage">
+      <canvas id="game" aria-label="遊戲畫面"></canvas>
+
+      <div id="hud" hidden>
+        <button id="btn-pause" class="hud-btn" aria-label="暫停">❚❚</button>
+        <div class="meter" id="meter">
+          <span class="meter-ico"></span>
+          <div class="bar"><i id="meter-fill"></i><em id="meter-text"></em></div>
+        </div>
+        <div id="lives" aria-label="生命"></div>
+        <div id="light" aria-label="紅綠燈"><i class="r"></i><i class="y"></i><i class="g"></i></div>
+        <div id="score">0</div>
+      </div>
+
+      <div id="charge" hidden>
+        <div class="track">
+          <i class="zone cap"></i><i class="zone over"></i>
+          <i id="charge-fill"></i>
+          <span class="tick" style="left:22.2%"><b>1</b></span>
+          <span class="tick" style="left:44.4%"><b>2</b></span>
+          <span class="tick" style="left:66.7%"><b>3</b></span>
+        </div>
+        <small>按住蓄力・放開起跳　<u>1 2 3</u> = 車身長度</small>
+      </div>
+
+      <div id="hint" hidden>
+        <div class="finger"></div>
+        <p><b>點住</b>你想去的方向<br>停越久跳越遠，<b>放開</b>就起跳！</p>
+      </div>
+      <div id="banner" hidden></div>
+    </div>
+
+    <div id="layer" hidden></div>
+    <div id="modal" hidden></div>
+    <div id="toast" role="status"></div>
+  </div>
+
+  <noscript><p style="color:#fff;padding:24px">需要啟用 JavaScript 才能遊玩。</p></noscript>
+  <script src="vendor/qrcode.js"></script>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
