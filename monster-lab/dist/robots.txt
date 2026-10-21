@@ -1,6 +1,5 @@
 User-agent: *
 Allow: /
 Disallow: /api/
-Disallow: /login
 
-Sitemap: https://mosterlab.com/sitemap.xml
+Sitemap: https://www.mosterlab.com/sitemap.xml

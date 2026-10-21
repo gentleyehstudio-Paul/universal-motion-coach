@@ -21,7 +21,7 @@ assert.equal(timing('basketball',{}).complete,false);
 const fs=await import('node:fs/promises');
 const landing=await fs.readFile('./dist/index.html','utf8');
 const appHtml=await fs.readFile('./dist/app/index.html','utf8');
-assert.match(landing,/href="\/app\//);
+assert.match(landing,/href="\/app"/);assert.ok(!landing.includes('href="/app/"'),"internal links use /app (cleanUrls), not /app/");
 for(const asset of ['landing.js','data:image/jpeg;base64,','--ml-banner3','--ml-banner4','--ml-banner5','--ml-banner6','hero-banner-c','aria-label="Illustrative basketball form artwork'])assert.ok(landing.includes(asset),`Landing page must include ${asset}`);
 const landingCss=await fs.readFile('./dist/landing.css','utf8');assert.match(landingCss,/@keyframes banner-c/);
 const landingIcon=landing.match(/<link rel="icon" href="([^"]+)"/),appIcon=appHtml.match(/<link rel="icon" href="([^"]+)"/);assert.ok(landingIcon&&appIcon);assert.equal(landingIcon[1],appIcon[1],'Home and app tab icons must match');
