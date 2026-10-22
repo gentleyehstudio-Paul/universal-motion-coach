@@ -157,6 +157,7 @@ frog-in-taipei/
 
 純靜態，任何靜態主機都行。
 
+- **Cloudflare Pages 常見坑**：這個遊戲在 monorepo 的子資料夾裡，**Build output directory 一定要填 `frog-in-taipei`**，否則 Cloudflare 會把整個 repo 根目錄當網站發布（網址打開是空白，而且其他資料夾的檔案會被公開）。Production branch 也要選遊戲所在的分支。改完設定後，推一個新 commit 就會自動重新部署。
 - **Cloudflare Pages**：連 Git repo → Build command 留空、Build output directory 填 `frog-in-taipei`（或把這個資料夾單獨成 repo 填 `/`）。`_headers` 已附好。自訂網域設 `game.cardstox.com.tw`。
 - **Vercel**：Framework preset 選 *Other*，Root Directory 設 `frog-in-taipei`，不需 build。`vercel.json` 已附好。
 - 效能：首次載入約 230 KB（含 QR code 套件 56 KB），無圖片 / 字型 / 音檔，4G 下 3 秒內可玩。字型使用系統中文字體。
