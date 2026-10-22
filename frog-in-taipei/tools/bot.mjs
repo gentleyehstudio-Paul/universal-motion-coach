@@ -83,10 +83,10 @@ function plan(sim) {
       }
       if (!kind) continue;
       // would the carrier leave the screen soon after landing?
-      if (hit && !hit.parked) {
+      if (hit && !hit.parked && hit.kind !== 'delivery') { // (a winning hop onto the delivery bike never has to stay)
         const xs = traj.get(hit.id);
         const px = xs[Math.min(ahead, xs.length - 1)];
-        const stay = KINDS[hit.kind].stay === 'helmet' ? sim.cfg.stay.helmet : sim.cfg.stay.roof;
+        const stay = sim.cfg.stay.vehicle > 0 ? sim.cfg.stay.vehicle : 3;
         const exit = px + hit.vx * stay;
         if (exit < 20 || exit > sim.W - 20) continue;
       }
@@ -98,7 +98,11 @@ function plan(sim) {
           if (px >= w[0] + 6 && px <= w[1] - 6) goal = 1000;
         } else goal = 1000;
       }
-      const gain = f.y - ty;
+      let gain = f.y - ty;
+      if (hit && hit.parked) { // in the parking row, creep sideways towards the marked scooter
+        const gv = sim.vehicles.find((v) => v.goal);
+        if (gv) gain += (Math.abs(f.x - gv.x) - Math.abs(hit.x - gv.x)) * 0.5;
+      }
       const s = goal + gain * 2 + (kind === 'static' ? 6 : 0) + margin * 12 - c * 0.05 - Math.abs(a) * 0.05;
       if (!best || s > best.s) best = { s, c, ux, uy, ty, tx, gain };
     }

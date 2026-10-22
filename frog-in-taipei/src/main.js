@@ -107,7 +107,7 @@ function flushEvents() {
   audio.onEvents(sim.events);
   for (const e of sim.events) {
     if (e.k === 'jump' && !save.get().tutorialDone) { save.set({ tutorialDone: true }); $('#hint').hidden = true; }
-    if (e.k === 'fall') toast(e.reason === 'slip' ? '安全帽停太久，滑下來了！' : e.reason === 'carried' ? '被車載走了！' : e.reason === 'over' ? '跳過頭，掉到地面！' : '沒踩到，掉到地面！');
+    if (e.k === 'fall') toast(e.reason === 'slip' ? '在車上停太久，滑下來了！' : e.reason === 'carried' ? '被車載走了！' : e.reason === 'over' ? '跳過頭，掉到地面！' : '沒踩到，掉到地面！');
     if (e.k === 'light' && e.s === 'red') audio.tick();
   }
   sim.events.length = 0;
@@ -223,18 +223,18 @@ function showTitle() {
   const c = logo.getContext('2d');
   c.imageSmoothingEnabled = false;
   drawFrogSide(c, 80, 96, 5);
-  // helmet pedestal
-  c.fillStyle = '#8c5be0'; c.beginPath(); c.ellipse(86, 104, 46, 12, 0, 0, 7); c.fill();
-  c.fillStyle = 'rgba(255,255,255,.4)'; c.fillRect(96, 98, 14, 3);
+  // taxi roof pedestal
+  c.fillStyle = '#f7c51e'; c.fillRect(30, 98, 112, 16); c.fillStyle = '#ffd84a'; c.fillRect(34, 98, 104, 5);
+  c.fillStyle = '#fff'; c.fillRect(80, 91, 20, 8); c.fillStyle = '#1f2430'; c.fillRect(84, 94, 12, 2);
   show(`
     <div class="center" id="logo-slot"></div>
     ${cfg.brand.poc ? '<div class="center"><span class="poc-badge">POC 示範版</span></div>' : ''}
     <h1>樹蛙進城<small>FROG IN TAIPEI</small></h1>
-    <p class="center">一隻口渴的翡翠樹蛙在台北街頭迷路了。<br>踩著騎士的安全帽，跳過車流——先喝一杯，再吃一鍋！</p>
+    <p class="center">一隻口渴的翡翠樹蛙在台北街頭迷路了。<br>踩著車頂跳過台北的車流——先喝一杯，再吃一鍋！</p>
     <div class="steps">
       <div><b>👆</b>點住想去的方向<br>蓄力</div>
       <div><b>🐸</b>放開起跳<br>最遠 3 個車身</div>
-      <div><b>⏱</b>安全帽只能站 2 秒</div>
+      <div><b>⏱</b>每台車只能站 ${cfg.stay.vehicle} 秒</div>
     </div>
     <button class="btn" data-act="start">開始遊戲</button>
     <div class="row">
@@ -276,9 +276,9 @@ function showIntro(levelIdx) {
       <li><span>🎯 目標</span><b style="text-align:right;max-width:70%">${esc(L.goalHint)}</b></li>
       <li><span>❤️ 生命</span><b>${cfg.lives} 條</b></li>
       <li><span>⏱ ${esc(L.meter)}</span><b>${L.durationSeconds ?? cfg.thirst.durationSeconds} 秒（撿水滴可補充）</b></li>
-      <li><span>🪖 安全帽停留</span><b>${cfg.stay.helmet} 秒（前 ${tut} 秒新手 ${cfg.stay.tutorialHelmet} 秒）</b></li>
+      <li><span>🚗 單一車輛停留</span><b>${cfg.stay.vehicle > 0 ? `${cfg.stay.vehicle} 秒（前 ${tut} 秒新手 ${cfg.stay.tutorialVehicle} 秒）` : '不限'}</b></li>
     </ul>
-    <p class="muted center">紅燈時車流會停下來——正是過馬路的好時機。停在機車待轉區可以存檔。</p>
+    <p class="muted center">紅燈時車流會停下來——正是過馬路的好時機。掉下去會回到上一台踩過的車。</p>
     <button class="btn" data-act="go">出發！</button>
   `, 'clear');
 }
@@ -292,7 +292,7 @@ function beginLevel() {
   updateHud();
   if (!save.get().tutorialDone && sim.levelIdx === 0) $('#hint').hidden = false;
   else $('#hint').hidden = true;
-  if (sim.levelIdx === 0) banner('前 10 秒新手保護：安全帽可以多停 1 秒', 3500);
+  if (sim.levelIdx === 0) banner(`前 ${cfg.stay.tutorialSeconds} 秒新手保護：每台車可以多停 ${Math.max(0, cfg.stay.tutorialVehicle - cfg.stay.vehicle)} 秒`, 3500);
   else banner(sim.L.goalHint, 3800);
 }
 

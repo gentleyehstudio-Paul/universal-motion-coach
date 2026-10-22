@@ -171,7 +171,7 @@ function busBody(c, v, tail) {
 }
 
 function scooterBody(c, v, time, opt, delivery, tail) {
-  const shake = opt.shake ? ((Math.floor(time * 14) % 2) ? 1 : -1) : 0;
+  const shake = 0;
   const body = delivery ? '#ece4d8' : CAR_COLORS[v.c];
   const jacket = delivery ? '#3b4ac8' : JACKETS[v.c];
   const helmet = delivery ? '#8c5be0' : HELMETS[(v.c + (v.id % 3)) % 8];
@@ -246,13 +246,12 @@ export function paintWorld(layout, levelCfg, seed = 7) {
   rows.forEach((r, i) => {
     const below = rows[i - 1];
     if (r.t === 'island') paintIsland(c, r, W, rnd);
-    else if (r.t === 'zone') paintZone(c, r, W, labels);
     else if (r.t === 'parking') paintParking(c, r, W);
     // lane boundary lines
     if (r.t === 'lane' && below && below.t === 'lane') {
       const opposite = below.dir !== r.dir;
       const y = Math.round(r.y + r.h);
-      if (opposite && r.speed > 50 === below.speed > 50 && (i % 5 === 0)) {
+      if (opposite) { // traffic changes direction here: double yellow centre line
         fr(c, 0, y - 1, W, 1, PAL.yellow); fr(c, 0, y + 1, W, 1, PAL.yellow);
       } else {
         for (let x = 4; x < W; x += 14) fr(c, x, y, 8, 1, PAL.line);
@@ -293,21 +292,6 @@ function paintIsland(c, r, W, rnd) {
   disc(c, 40, r.y + r.h / 2, 9, 8, '#3d8a3a'); disc(c, 38, r.y + r.h / 2 - 2, 6, 5, '#58a850');
   disc(c, 232, r.y + r.h / 2, 9, 8, '#3d8a3a'); disc(c, 230, r.y + r.h / 2 - 2, 6, 5, '#58a850');
   fr(c, 12, r.y + 2, W - 24, 1, '#7acb5e');
-}
-
-function paintZone(c, r, W, labels) {
-  const x = r.x, y = r.y + 2, w = r.w, h = r.h - 4;
-  fr(c, x, y, w, h, '#7a4b4b');
-  for (let i = 0; i < w * h / 9; i++) fr(c, x + ((Math.sin(i * 12.9) * 43758) % 1 + 1) % 1 * w | 0, y + ((Math.sin(i * 78.2) * 24634) % 1 + 1) % 1 * h | 0, 1, 1, '#8a5a5a');
-  fr(c, x, y, w, 1, PAL.line); fr(c, x, y + h - 1, w, 1, PAL.line);
-  fr(c, x, y, 1, h, PAL.line); fr(c, x + w - 1, y, 1, h, PAL.line);
-  // scooter pictogram
-  for (const px of [x + 14, x + w - 14]) {
-    fr(c, px - 5, y + h / 2 - 1, 8, 3, PAL.line); fr(c, px + 2, y + h / 2 - 3, 2, 7, PAL.line); fr(c, px - 3, y + h / 2 - 4, 3, 3, PAL.line);
-  }
-  labels.push({ text: '機車待轉區', x: x + w / 2, y: y + h / 2 + 0.5, size: 8.5, color: '#fff1d6', weight: 800 });
-  // little flag = checkpoint
-  fr(c, x + w - 9, y + 3, 1, 6, '#e8e8e8'); fr(c, x + w - 8, y + 3, 4, 3, '#ffcf3a');
 }
 
 function paintParking(c, r, W) {

@@ -67,7 +67,7 @@ export class Renderer {
       else if (e.k === 'fall') {
         for (let i = 0; i < 12; i++) this.parts.push({ x: e.x, y: e.y, vx: (Math.random() - 0.5) * 2.5, vy: (Math.random() - 0.5) * 1.5, life: 0.7, col: '#ffffff', size: 2, line: true });
         this._pop(e.reason === 'slip' ? '滑落！' : e.reason === 'over' ? '跳過頭！' : '呼～', e.x, e.y - 12, '#ffe08a');
-      } else if (e.k === 'checkpoint') this._pop('存檔！', e.x, e.y - 10, '#c8ffb0');
+      }
       else if (e.k === 'win') {
         for (let i = 0; i < 46; i++) this.parts.push({ x: e.x, y: e.y, vx: (Math.random() - 0.5) * 3.5, vy: -Math.random() * 3.2 - 0.6, life: 1.3, col: ['#ffd23f', '#4fcf63', '#59c8ff', '#ff7a7a', '#fff'][i % 5], size: 2, g: 0.07 });
       }
@@ -103,9 +103,7 @@ export class Renderer {
     const red = sim.light.state === 'red';
     for (const v of sim.vehicles) {
       if (v.y < cam - 20 || v.y > cam + vh + 20) continue;
-      const carrying = v.id === f.vid;
-      const shake = carrying && f.stay !== Infinity && f.stay < 60 && KINDS_HELMET(v);
-      drawVehicle(c, v, this.time, { braking: red && !(v.lane && v.lane.ignoreLight), shake });
+      drawVehicle(c, v, this.time, { braking: red && !(v.lane && v.lane.ignoreLight) });
       if (v.goal) this._goalMark(c, v, sim);
       else if (v.kind === 'delivery') this._deliveryMark(c, v, sim);
     }
@@ -361,4 +359,3 @@ export class Renderer {
   }
 }
 
-function KINDS_HELMET(v) { return v.kind === 'scooter' || v.kind === 'delivery'; }

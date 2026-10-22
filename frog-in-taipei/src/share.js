@@ -29,9 +29,9 @@ export function makeShareImage({ score, title, subtitle, lines = [], url, cardNa
 
   c.imageSmoothingEnabled = false;
   drawFrogSide(c, 470, 780, 24);
-  // little helmet pedestal
-  c.fillStyle = '#8c5be0'; c.beginPath(); c.ellipse(560, 800, 190, 52, 0, 0, 7); c.fill();
-  c.fillStyle = 'rgba(255,255,255,0.35)'; c.fillRect(620, 770, 60, 16);
+  // taxi roof pedestal
+  c.fillStyle = '#f7c51e'; c.fillRect(250, 770, 540, 70); c.fillStyle = '#ffd84a'; c.fillRect(270, 770, 500, 22);
+  c.fillStyle = '#fff'; c.fillRect(500, 735, 80, 36); c.fillStyle = '#1f2430'; c.fillRect(520, 748, 40, 8);
 
   c.fillStyle = 'rgba(0,0,0,0.38)'; roundRect(c, 90, 880, S - 180, 390, 44); c.fill();
   c.fillStyle = '#fff'; c.font = `800 52px ${FONT}`; c.fillText(title, S / 2, 962);

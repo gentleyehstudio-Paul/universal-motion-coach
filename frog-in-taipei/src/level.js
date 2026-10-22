@@ -1,6 +1,6 @@
 // Turns the declarative rows of a level (listed bottom -> top, i.e. in the order
 // the frog crosses them) into world coordinates. Pure data, no DOM.
-const DEFAULT_H = { island: 36, lane: null, zone: null, parking: 34 };
+const DEFAULT_H = { island: 36, lane: null, parking: 34 };
 
 export function buildLayout(cfg, idx) {
   const L = cfg.levels[idx];
@@ -22,8 +22,6 @@ export function buildLayout(cfg, idx) {
     rows.push(row);
     if (r.t === 'island') {
       statics.push({ kind: 'island', x: 10, y, w: W - 20, h, row: i });
-    } else if (r.t === 'zone') {
-      statics.push({ kind: 'zone', x: r.x, y: y + 2, w: r.w, h: h - 4, row: i });
     }
   });
 

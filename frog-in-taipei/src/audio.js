@@ -38,7 +38,6 @@ export const audio = {
   land() { tone(180, 0.07, { type: 'triangle', vol: 0.07, slide: -60 }); },
   drop() { tone(880, 0.09, { type: 'sine', vol: 0.06 }); tone(1320, 0.12, { type: 'sine', vol: 0.05, delay: 0.07 }); },
   fall() { tone(420, 0.45, { type: 'sawtooth', vol: 0.04, slide: -330 }); },
-  checkpoint() { tone(660, 0.08, { type: 'triangle', vol: 0.05 }); tone(990, 0.12, { type: 'triangle', vol: 0.05, delay: 0.08 }); },
   win() { [523, 659, 784, 1047].forEach((f, i) => tone(f, 0.16, { type: 'square', vol: 0.05, delay: i * 0.11 })); },
   lose() { [392, 330, 262].forEach((f, i) => tone(f, 0.22, { type: 'triangle', vol: 0.06, delay: i * 0.16 })); },
   tick() { tone(1000, 0.03, { type: 'square', vol: 0.02 }); },
@@ -50,7 +49,6 @@ export const audio = {
       else if (e.k === 'land') this.land();
       else if (e.k === 'drop') this.drop();
       else if (e.k === 'fall') this.fall();
-      else if (e.k === 'checkpoint') this.checkpoint();
       else if (e.k === 'win') this.win();
       else if (e.k === 'lose') this.lose();
     }

@@ -27,10 +27,9 @@
   },
 
   "stay": {
-    "helmet": 2,
-    "roof": 4,
+    "vehicle": 3,
     "tutorialSeconds": 10,
-    "tutorialHelmet": 3
+    "tutorialVehicle": 4
   },
 
   "lives": 3,
@@ -129,19 +128,17 @@
       "rows": [
         { "t": "island" },
         { "t": "lane", "dir": 1,  "speed": 26, "gap": [1.1, 2.4], "kinds": { "taxi": 3, "sedan": 3, "bus": 2, "van": 1 } },
-        { "t": "lane", "dir": -1, "speed": 30, "gap": [1.1, 2.4], "kinds": { "taxi": 3, "sedan": 3, "bus": 2, "van": 1 } },
+        { "t": "lane", "dir": 1,  "speed": 30, "gap": [1.1, 2.4], "kinds": { "taxi": 3, "sedan": 3, "bus": 2, "van": 1 } },
         { "t": "lane", "dir": 1,  "speed": 34, "gap": [1.1, 2.4], "kinds": { "taxi": 3, "sedan": 3, "bus": 2, "van": 1 } },
-        { "t": "lane", "dir": -1, "speed": 30, "gap": [1.1, 2.4], "kinds": { "taxi": 3, "sedan": 3, "bus": 2, "van": 1 } },
-        { "t": "lane", "dir": 1,  "speed": 36, "gap": [1.1, 2.4], "kinds": { "taxi": 3, "sedan": 3, "bus": 2, "van": 1 } },
-        { "t": "zone", "x": 75, "w": 120 },
-        { "t": "lane", "dir": -1, "speed": 40, "gap": [0.9, 2.0], "kinds": { "scooter": 5, "taxi": 1, "sedan": 1, "van": 1 } },
-        { "t": "lane", "dir": 1,  "speed": 44, "gap": [0.9, 2.0], "kinds": { "scooter": 5, "taxi": 1, "sedan": 1, "van": 1 } },
-        { "t": "lane", "dir": -1, "speed": 48, "gap": [0.9, 2.0], "kinds": { "scooter": 5, "taxi": 1, "sedan": 1, "van": 1 } },
-        { "t": "zone", "x": 110, "w": 100 },
+        { "t": "lane", "dir": -1,"speed": 30, "gap": [1.1, 2.4], "kinds": { "taxi": 3, "sedan": 3, "bus": 2, "van": 1 } },
+        { "t": "lane", "dir": -1,"speed": 36, "gap": [1.1, 2.4], "kinds": { "taxi": 3, "sedan": 3, "bus": 2, "van": 1 } },
+        { "t": "lane", "dir": -1,"speed": 40, "gap": [0.9, 2.0], "kinds": { "scooter": 5, "taxi": 1, "sedan": 1, "van": 1 } },
+        { "t": "lane", "dir": -1,"speed": 44, "gap": [0.9, 2.0], "kinds": { "scooter": 5, "taxi": 1, "sedan": 1, "van": 1 } },
+        { "t": "lane", "dir": -1,"speed": 48, "gap": [0.9, 2.0], "kinds": { "scooter": 5, "taxi": 1, "sedan": 1, "van": 1 } },
         { "t": "lane", "dir": 1,  "speed": 56, "gap": [0.7, 1.5], "kinds": { "scooter": 1 } },
-        { "t": "lane", "dir": -1, "speed": 60, "gap": [0.7, 1.5], "kinds": { "scooter": 1 } },
+        { "t": "lane", "dir": 1,  "speed": 60, "gap": [0.7, 1.5], "kinds": { "scooter": 1 } },
         { "t": "lane", "dir": 1,  "speed": 64, "gap": [0.7, 1.5], "kinds": { "scooter": 1 } },
-        { "t": "lane", "dir": -1, "speed": 60, "gap": [0.7, 1.5], "kinds": { "scooter": 1 } },
+        { "t": "lane", "dir": 1,  "speed": 60, "gap": [0.7, 1.5], "kinds": { "scooter": 1 } },
         { "t": "lane", "dir": 1,  "speed": 66, "gap": [0.7, 1.5], "kinds": { "scooter": 1 } },
         { "t": "lane", "dir": 1,  "speed": 46, "gap": [1.4, 3.0], "kinds": { "scooter": 1 }, "ignoreLight": true, "delivery": true }
       ]
@@ -151,7 +148,7 @@
       "title": "第二關｜肚子餓了",
       "subtitle": "喝飽了！現在肚子咕嚕叫——台北車站、忠孝西路，一鍋熱呼呼的火鍋在 B1 等你。",
       "meter": "飢餓值",
-      "goalHint": "跳上停在「石研室」門口、有發亮標記的騎士安全帽，搭手扶梯下 B1！",
+      "goalHint": "跳上停在「石研室」門口、有發亮標記的機車，搭手扶梯下 B1！",
       "theme": "station",
       "curbHeight": 100,
       "light": { "green": 7, "yellow": 1, "red": 5 },
@@ -168,22 +165,19 @@
       "rows": [
         { "t": "island" },
         { "t": "lane", "dir": 1,  "speed": 24, "gap": [1.0, 2.2], "kinds": { "bus": 3, "taxi": 3, "sedan": 2, "van": 1 } },
-        { "t": "lane", "dir": -1, "speed": 28, "gap": [1.0, 2.2], "kinds": { "bus": 3, "taxi": 3, "sedan": 2, "van": 1 } },
+        { "t": "lane", "dir": 1,  "speed": 28, "gap": [1.0, 2.2], "kinds": { "bus": 3, "taxi": 3, "sedan": 2, "van": 1 } },
         { "t": "lane", "dir": 1,  "speed": 32, "gap": [1.0, 2.2], "kinds": { "bus": 3, "taxi": 3, "sedan": 2, "van": 1 } },
-        { "t": "lane", "dir": -1, "speed": 30, "gap": [1.0, 2.2], "kinds": { "bus": 3, "taxi": 3, "sedan": 2, "van": 1 } },
-        { "t": "lane", "dir": 1,  "speed": 34, "gap": [1.0, 2.2], "kinds": { "bus": 3, "taxi": 3, "sedan": 2, "van": 1 } },
-        { "t": "zone", "x": 60, "w": 110 },
-        { "t": "lane", "dir": -1, "speed": 42, "gap": [0.9, 1.9], "kinds": { "scooter": 5, "taxi": 1, "bus": 1, "van": 1 } },
-        { "t": "lane", "dir": 1,  "speed": 46, "gap": [0.9, 1.9], "kinds": { "scooter": 5, "taxi": 1, "bus": 1, "van": 1 } },
-        { "t": "lane", "dir": -1, "speed": 50, "gap": [0.9, 1.9], "kinds": { "scooter": 5, "taxi": 1, "bus": 1, "van": 1 } },
-        { "t": "zone", "x": 130, "w": 110 },
+        { "t": "lane", "dir": -1,"speed": 30, "gap": [1.0, 2.2], "kinds": { "bus": 3, "taxi": 3, "sedan": 2, "van": 1 } },
+        { "t": "lane", "dir": -1,"speed": 34, "gap": [1.0, 2.2], "kinds": { "bus": 3, "taxi": 3, "sedan": 2, "van": 1 } },
+        { "t": "lane", "dir": -1,"speed": 42, "gap": [0.9, 1.9], "kinds": { "scooter": 5, "taxi": 1, "bus": 1, "van": 1 } },
+        { "t": "lane", "dir": -1,"speed": 46, "gap": [0.9, 1.9], "kinds": { "scooter": 5, "taxi": 1, "bus": 1, "van": 1 } },
+        { "t": "lane", "dir": -1,"speed": 50, "gap": [0.9, 1.9], "kinds": { "scooter": 5, "taxi": 1, "bus": 1, "van": 1 } },
         { "t": "lane", "dir": 1,  "speed": 58, "gap": [0.7, 1.5], "kinds": { "scooter": 1 } },
-        { "t": "lane", "dir": -1, "speed": 62, "gap": [0.7, 1.5], "kinds": { "scooter": 1 } },
+        { "t": "lane", "dir": 1,  "speed": 62, "gap": [0.7, 1.5], "kinds": { "scooter": 1 } },
         { "t": "lane", "dir": 1,  "speed": 66, "gap": [0.7, 1.5], "kinds": { "scooter": 1 } },
-        { "t": "lane", "dir": -1, "speed": 62, "gap": [0.7, 1.5], "kinds": { "scooter": 1 } },
-        { "t": "zone", "x": 70, "w": 120 },
+        { "t": "lane", "dir": 1,  "speed": 62, "gap": [0.7, 1.5], "kinds": { "scooter": 1 } },
         { "t": "lane", "dir": 1,  "speed": 60, "gap": [0.7, 1.5], "kinds": { "scooter": 1 } },
-        { "t": "lane", "dir": -1, "speed": 64, "gap": [0.7, 1.5], "kinds": { "scooter": 1 } },
+        { "t": "lane", "dir": 1,  "speed": 64, "gap": [0.7, 1.5], "kinds": { "scooter": 1 } },
         { "t": "parking", "h": 34, "bays": [26, 58, 90, 122, 154, 186, 218, 246], "goalBay": 4 }
       ]
     }

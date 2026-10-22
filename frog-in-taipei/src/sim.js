@@ -14,14 +14,14 @@ export const DT = 1 / HZ;
 const TUMBLE_TICKS = 54;
 const PICKUP_R = 10;
 
-// helmet: x offset of the rider's helmet in local sprite coords (front = +x)
+// Every vehicle is a platform the frog can ride; sizes are in world units (1 car = 34).
 export const KINDS = {
-  sedan:    { w: 32, h: 17, stay: 'roof' },
-  taxi:     { w: 34, h: 17, stay: 'roof' },
-  van:      { w: 38, h: 18, stay: 'roof' },
-  bus:      { w: 64, h: 19, stay: 'roof' },
-  scooter:  { w: 17, h: 10, stay: 'helmet', helmet: -1 },
-  delivery: { w: 21, h: 11, stay: 'helmet', helmet: 1 },
+  sedan:    { w: 32, h: 17 },
+  taxi:     { w: 34, h: 17 },
+  van:      { w: 38, h: 18 },
+  bus:      { w: 64, h: 19 },
+  scooter:  { w: 17, h: 10 },
+  delivery: { w: 21, h: 11 },
 };
 
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
@@ -152,7 +152,7 @@ export class Sim {
   }
 
   _placeDrops() {
-    const rows = this.lay.rows.filter((r) => r.t === 'lane' || r.t === 'zone');
+    const rows = this.lay.rows.filter((r) => r.t === 'lane');
     const n = this.L.drops ?? 12;
     for (let k = 0; k < n; k++) {
       const row = rows[Math.min(rows.length - 1, Math.floor(((k + 0.5) * rows.length) / n))];
@@ -271,11 +271,12 @@ export class Sim {
     return null;
   }
 
-  _stayTicks(kind) {
+  // How long the frog may stay on one vehicle. stay.vehicle <= 0 turns the limit off.
+  _stayTicks() {
     const S = this.cfg.stay;
-    const k = KINDS[kind];
-    let sec = S[k.stay];
-    if (this.t < S.tutorialSeconds * HZ && k.stay === 'helmet') sec = Math.max(sec, S.tutorialHelmet);
+    let sec = S.vehicle;
+    if (!(sec > 0)) return Infinity;
+    if (this.t < S.tutorialSeconds * HZ) sec = Math.max(sec, S.tutorialVehicle || 0);
     return Math.round(sec * HZ);
   }
 
@@ -302,18 +303,14 @@ export class Sim {
 
   _standOnVehicle(v, tx, ty, respawn = false) {
     const f = this.frog, j = f.jump;
-    const k = KINDS[v.kind];
-    let ox, oy;
-    if (k.stay === 'helmet') {
-      if (v.vert) { ox = 0; oy = -k.helmet; } else { ox = k.helmet * v.dir; oy = 0; }
-    } else {
-      ox = clamp(tx - v.x, -v.w / 2 + 4, v.w / 2 - 4);
-      oy = clamp(ty - v.y, -v.h / 2 + 4, v.h / 2 - 4);
-    }
+    // the frog sits where it landed (clamped onto the vehicle); on a delivery bike it sits on the box
+    let ox = clamp(tx - v.x, -v.w / 2 + 4, v.w / 2 - 4);
+    let oy = clamp(ty - v.y, -v.h / 2 + 3, v.h / 2 - 3);
+    if (v.kind === 'delivery') { ox = -5 * v.dir; oy = 0; }
     f.state = 'stand'; f.vid = v.id; f.sidx = -1; f.ox = ox; f.oy = oy;
     f.x = v.x + ox; f.y = v.y + oy; f.z = 0; f.jump = null;
     if (j && j.from === v.id) { f.stay = j.stayLeft; f.stayMax = j.stayMax; }
-    else { f.stay = this._stayTicks(v.kind); f.stayMax = f.stay; }
+    else { f.stay = this._stayTicks(); f.stayMax = f.stay; }
     f.last = { vid: v.id, lane: v.lane, x: f.x, y: f.y };
     if (respawn) return;
     this.events.push({ k: 'land', x: f.x, y: f.y, kind: v.kind });
@@ -331,10 +328,6 @@ export class Sim {
     f.x = tx; f.y = ty; f.z = 0; f.jump = null;
     f.stay = Infinity; f.stayMax = Infinity;
     f.last = { sidx: si, x: tx, y: ty };
-    if (s.kind === 'zone') {
-      this.checkpoint = { sidx: si, x: tx, y: ty };
-      this.events.push({ k: 'checkpoint', x: tx, y: ty });
-    }
     this.events.push({ k: 'land', x: tx, y: ty, kind: s.kind });
     this._progress(ty);
   }
@@ -380,8 +373,9 @@ export class Sim {
     if (v) {
       f.jump = null;
       this._standOnVehicle(v, v.x, v.y, true);
-      f.stay += 30; f.stayMax = f.stay; // a little grace after the tumble
+      if (f.stay !== Infinity) { f.stay += 30; f.stayMax = f.stay; } // a little grace after the tumble
     } else {
+      // nothing to ride: back to the start island (the only fixed safe spot)
       const cp = ls.sidx !== undefined && ls.sidx >= 0 ? ls : this.checkpoint;
       this._standOnStatic(cp.sidx, cp.x, cp.y);
     }
